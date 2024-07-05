@@ -14,11 +14,59 @@ public class IncomeEntity {
     @TypeConverters(DateTypeConverter.class)
     public Date date;
 
-    public String source;
+    public String category; // 카테고리
 
-    public String description;
+    public String description; // 상세 내역
 
-    public String amount;
+    public String amount; // 수입 금액
 
-    public String note;
+    public String note; // 메모
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 }

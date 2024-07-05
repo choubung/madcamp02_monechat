@@ -20,7 +20,63 @@ public class ExpenseEntity {
 
     public String amount; // 소비 금액
 
+    public boolean isSmartExpense; // 현명소비
+
     public String note; // 메모
 
-    // Getters and setters for each field can be added if needed
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isSmartExpense() {
+        return isSmartExpense;
+    }
+
+    public void setSmartExpense(boolean smartExpense) {
+        isSmartExpense = smartExpense;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 }
