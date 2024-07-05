@@ -1,4 +1,4 @@
-package com.example.monechat;
+package com.example.monechat.localdatabase;
 
 import androidx.room.TypeConverter;
 import java.util.Date;

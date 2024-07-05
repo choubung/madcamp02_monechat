@@ -1,4 +1,4 @@
-package com.example.monechat;
+package com.example.monechat.localdatabase;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
