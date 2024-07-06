@@ -31,7 +31,7 @@ public class ExpenseFragment extends Fragment {
     ExpenseAdapter adapter;
     ArrayList<ExpenseItem> expenseItems = new ArrayList<>();
     FloatingActionButton fab;
-//    private ActivityResultLauncher<Intent> addExpenseLauncher;
+    private ActivityResultLauncher<Intent> addExpenseLauncher;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,17 +61,19 @@ public class ExpenseFragment extends Fragment {
         });
 
         // ActivityResultLauncher 초기화 / 참고
-//        addExpenseLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                result -> {
-//                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-//                        ExpenseItem newItem = (ExpenseItem) result.getData().getSerializableExtra("expenseItem");
-//                        if (newItem != null) {
-//                            new AddExpense(getActivity(), newItem).start();
-//                        }
-//                    }
-//                }
-//        );
+        addExpenseLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+
+
+                        ExpenseItem newItem = (ExpenseItem) result.getData().getSerializableExtra("expenseItem");
+                        if (newItem != null) {
+                            new AddExpense(getActivity(), newItem).start();
+                        }
+                    }
+                }
+        );
 
         return rootView;
     }
