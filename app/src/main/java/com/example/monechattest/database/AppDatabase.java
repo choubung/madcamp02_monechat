@@ -10,7 +10,7 @@ import androidx.room.TypeConverters;
 @TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract ExpenseDao getExpenseDao();
-    // public abstract IncomeDao getIncomeDao();
+    public abstract IncomeDao getIncomeDao();
 
     private static volatile AppDatabase INSTANCE;
 

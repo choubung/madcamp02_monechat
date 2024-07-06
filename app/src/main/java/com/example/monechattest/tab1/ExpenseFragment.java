@@ -1,20 +1,162 @@
 package com.example.monechattest.tab1;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.monechattest.R;
+import com.example.monechattest.database.AppDatabase;
+import com.example.monechattest.database.ExpenseEntity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExpenseFragment extends Fragment {
+    RecyclerView recyclerView;
+    LinearLayoutManager layoutManager;
+    ExpenseAdapter adapter;
+    ArrayList<ExpenseItem> expenseItems = new ArrayList<>();
+    FloatingActionButton fab;
+//    private ActivityResultLauncher<Intent> addExpenseLauncher;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_expense, container, false);
 
+        recyclerView = rootView.findViewById(R.id.recyclerView);
+        layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        adapter = new ExpenseAdapter(getContext(), expenseItems);
+        recyclerView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new ExpenseAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ExpenseAdapter.ViewHolder holder, View view, int position) {
+                // TODO: 클릭시 보여주는 페이지 구현해야함
+            }
+        });
+
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab_btn);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), AddExpenseDetailActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // ActivityResultLauncher 초기화 / 참고
+//        addExpenseLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                result -> {
+//                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+//                        ExpenseItem newItem = (ExpenseItem) result.getData().getSerializableExtra("expenseItem");
+//                        if (newItem != null) {
+//                            new AddExpense(getActivity(), newItem).start();
+//                        }
+//                    }
+//                }
+//        );
+
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshContactList();
+    }
+
+    private void refreshContactList() {
+        expenseItems.clear();
+        new GetExpense(getActivity()).start();
+    }
+
+    class AddExpense extends Thread {
+        private Context context;
+        ExpenseItem item;
+
+        public AddExpense(Context context, ExpenseItem item) {
+            this.context = context;
+            this.item = item;
+        }
+
+        @Override
+        public void run() {
+            ExpenseEntity expense = new ExpenseEntity(item.getDescription(), item.getDate(), item.getCategory(), item.getAmount(), item.getNote());
+            long newIdx = AppDatabase.getInstance(context).getExpenseDao().insert(expense); // 새로 만든 entity contact를 넣기
+            item.setIdx((int) newIdx);
+
+            // UI 갱신
+            getActivity().runOnUiThread(() -> {
+                adapter.addItem(item);
+            });
+        }
+    }
+
+    class GetExpense extends Thread {
+        String TAG = "GetContact";
+        private Context context;
+
+        public GetExpense(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void run() {
+            List<ExpenseEntity> entities = AppDatabase.getInstance(context).getExpenseDao().getAllExpense();
+            expenseItems.clear();
+            for (ExpenseEntity entity : entities) {
+                ExpenseItem item = new ExpenseItem(entity.getIdx(), entity.getDescription(), entity.getDate(), entity.getCategory(), entity.getAmount(), entity.isSmartExpense());
+                expenseItems.add(item);
+            }
+            getActivity().runOnUiThread(() -> {
+                adapter.notifyDataSetChanged();
+            });
+        }
+    }
+
+    class DeleteExpense extends Thread {
+        String TAG = "DeleteContact";
+        private Context context;
+        private int idx; // 삭제할 연락처의 인덱스
+
+        public DeleteExpense(Context context, int idx) {
+            this.context = context;
+            this.idx = idx;
+        }
+
+        @Override
+        public void run() {
+            Log.d(TAG, "실행 시작");
+            AppDatabase.getInstance(context).getExpenseDao().delete(idx);
+            Log.d(TAG, "DB 삭제");
+
+            // UI 갱신
+            getActivity().runOnUiThread(() -> {
+                for (int i = 0; i < expenseItems.size(); i++) {
+                    if (expenseItems.get(i).getIdx() == idx) {
+                        expenseItems.remove(i);
+                        adapter.removeItem(i); // 어댑터에 삭제 알림/어댑터가 관리
+                        break;
+                    }
+                }
+            });
+        }
     }
 }
