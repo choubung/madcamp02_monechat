@@ -10,4 +10,12 @@
         android:layout_height="wrap_content"
         android:text="카카오 로그인" />
 
+    <Button
+        android:id="@+id/guest_login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="게스트 로그인"
+        android:layout_below="@id/kakao_login_button"
+        android:layout_marginTop="16dp" />
+
 </RelativeLayout>

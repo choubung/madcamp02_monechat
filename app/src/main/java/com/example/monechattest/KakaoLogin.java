@@ -22,9 +22,11 @@ public class KakaoLogin extends AppCompatActivity {
         setContentView(R.layout.activity_kakao_login);
 
         // 카카오 SDK 초기화
-        KakaoSdk.init(this, "카카오 앱키");
+        KakaoSdk.init(this, "이곳에 카카오앱키를 넣어야함");
 
         Button kakaoLoginButton = findViewById(R.id.kakao_login_button);
+        Button guestLoginButton = findViewById(R.id.guest_login_button);
+
         kakaoLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -37,6 +39,14 @@ public class KakaoLogin extends AppCompatActivity {
                     }
                     return null;
                 });
+            }
+        });
+
+        guestLoginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("GuestLogin", "게스트 로그인 선택");
+                moveToMainActivity();
             }
         });
     }
