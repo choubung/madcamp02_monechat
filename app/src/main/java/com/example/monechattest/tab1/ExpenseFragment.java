@@ -13,7 +13,7 @@ import com.example.monechattest.R;
 public class ExpenseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_2, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_expense, container, false);
 
         return rootView;
     }
