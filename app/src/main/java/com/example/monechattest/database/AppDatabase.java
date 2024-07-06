@@ -6,7 +6,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
-@Database(entities = {ExpenseEntity.class}, version = 1, exportSchema = false) // , IncomeEntity.class
+@Database(entities = {ExpenseEntity.class, IncomeEntity.class}, version = 1, exportSchema = false)
 @TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract ExpenseDao getExpenseDao();
