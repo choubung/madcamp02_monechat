@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/list_menu"
+        android:icon="@drawable/icon_list"
+        android:title=""
+        android:enabled="true"/> <!-- icon 바꿔야됨 -->
+
+    <item
+        android:id="@+id/chat"
+        android:icon="@drawable/icon_chat"
+        android:title=""
+        android:enabled="true"/> <!-- icon 바꿔야됨 -->
+
+    <item
+        android:id="@+id/expense_view"
+        android:icon="@drawable/icon_report"
+        android:title=""
+        android:enabled="true"/> <!-- icon 바꿔야됨 -->
+
+    <item
+        android:id="@+id/my_page"
+        android:icon="@drawable/icon_my_page"
+        android:title=""
+        android:enabled="true"/> <!-- icon 바꿔야됨 -->
+</menu>
