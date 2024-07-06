@@ -1,6 +1,7 @@
 package com.example.monechattest;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import com.example.monechattest.tab1.Fragment1;
 import com.example.monechattest.tab2.Fragment2;
 import com.example.monechattest.tab3.Fragment3;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kakao.sdk.common.util.Utility;
 
 // 커밋 테스트
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // 키 해시 확인
+        String keyHash = Utility.INSTANCE.getKeyHash(this);
+        Log.d("KakaoKeyHash", keyHash);
 
         // 프래그먼트 생성
         fragment1 = new Fragment1();
