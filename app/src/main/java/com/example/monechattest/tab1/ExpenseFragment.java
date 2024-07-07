@@ -148,7 +148,7 @@ public class ExpenseFragment extends Fragment {
             List<ExpenseEntity> entities = AppDatabase.getInstance(context).getExpenseDao().getAllExpense();
             expenseItems.clear();
             for (ExpenseEntity entity : entities) {
-                ExpenseItem item = new ExpenseItem(entity.getIdx(), entity.getDescription(), entity.getDate(), entity.getCategory(), entity.getAmount(), entity.isSmartExpense());
+                ExpenseItem item = new ExpenseItem(entity.getIdx(), entity.getDate(), entity.getCategory(), entity.getDescription(), entity.getAmount(), entity.getNote(), entity.isSmartExpense());
                 expenseItems.add(item);
             }
             getActivity().runOnUiThread(() -> {

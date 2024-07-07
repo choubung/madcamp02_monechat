@@ -1,5 +1,6 @@
 package com.example.monechattest.database;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -31,4 +32,7 @@ public interface ExpenseDao {
 
     @Query("SELECT SUM(CAST(amount AS REAL)) AS total FROM expense WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch')) = :yearMonth")
     double getTotalForMonth(String yearMonth); // gpt코드 (240707)
+
+    @Query("SELECT SUM(CAST(amount AS REAL)) FROM expense WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch')) = :yearMonth")
+    LiveData<Double> getTotalForMonthLiveData(String yearMonth);
 }

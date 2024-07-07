@@ -128,15 +128,16 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         String memo = memoText.getText().toString();
         String category = spinner.getSelectedItem().toString();
 
-        Date date = null;
+        Date date = null; // 데이터 컨버터
         try {
             date = dateFormat.parse(dateStr);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        ExpenseItem expenseItem = new ExpenseItem(date, category, description, amount, false, memo);
+        ExpenseItem expenseItem = new ExpenseItem(0, date, category, description, amount, memo, false);
 
+        // intent에 담아서 소비 리스트쪽으로
         Intent intent = new Intent();
         intent.putExtra("expenseItem", expenseItem);
         setResult(RESULT_OK, intent);

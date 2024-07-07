@@ -17,20 +17,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="23dp"
-            android:layout_height="23dp"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/icon_menubar"
-            android:layout_marginLeft="10dp"/>
-
         <Spinner
             android:id="@+id/spinnerMonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:layout_marginHorizontal="100dp"
             android:textSize="20sp"/>
