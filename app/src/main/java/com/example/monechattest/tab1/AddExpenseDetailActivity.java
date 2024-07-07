@@ -123,7 +123,7 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
     // gpt코드
     private void saveExpense() {
         String description = descriptionText.getText().toString();
-        String amount = amountText.getText().toString().replace(",", "");
+        String amount = amountText.getText().toString().replace(",","");
         String dateStr = dateText.getText().toString();
         String memo = memoText.getText().toString();
         String category = spinner.getSelectedItem().toString();

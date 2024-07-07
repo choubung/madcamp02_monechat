@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,6 +52,14 @@ public class ExpenseFragment extends Fragment {
             }
         });
 
+        adapter.setOnItemLongClickListener(new ExpenseAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(ExpenseAdapter.ViewHolder holder, View view, int position) {
+                ExpenseItem item = adapter.getItem(position);
+                showDeleteConfirmationDialog(item);
+            }
+        });
+
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab_btn);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,6 +95,16 @@ public class ExpenseFragment extends Fragment {
     private void refreshContactList() {
         expenseItems.clear();
         new GetExpense(getActivity()).start();
+    }
+
+    // 삭제 확인 다이얼로그 표시
+    private void showDeleteConfirmationDialog(ExpenseItem item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("삭제 확인")
+                .setMessage(item.getDescription() + " 내역을 삭제하시겠습니까?")
+                .setPositiveButton("삭제", (dialogInterface, i) -> new DeleteExpense(getActivity(), item.getIdx()).start())
+                .setNegativeButton("취소", null)
+                .show();
     }
 
     class AddExpense extends Thread {
@@ -144,18 +163,22 @@ public class ExpenseFragment extends Fragment {
 
         @Override
         public void run() {
-            Log.d(TAG, "실행 시작");
             AppDatabase.getInstance(context).getExpenseDao().delete(idx);
-            Log.d(TAG, "DB 삭제");
 
             // UI 갱신
             getActivity().runOnUiThread(() -> {
-                for (int i = 0; i < expenseItems.size(); i++) {
-                    if (expenseItems.get(i).getIdx() == idx) {
-                        expenseItems.remove(i);
-                        adapter.removeItem(i); // 어댑터에 삭제 알림/어댑터가 관리
-                        break;
+                try {
+                    for (int i = 0; i < expenseItems.size(); i++) {
+                        if (expenseItems.get(i).getIdx() == idx) {
+                            expenseItems.remove(i);
+                            // 기존 코드 adapter.removeItem(i); // 어댑터에 삭제 알림/어댑터가 관리
+                            adapter.notifyItemRemoved(i); // notifyDataSetChanged 대신 notifyItemRemoved 사용
+                            break;
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("DeleteExpense", "아이템 삭제 중 문제 발생");
                 }
             });
         }
