@@ -89,7 +89,9 @@ public class ExpenseFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        refreshContactList();
+        if (addExpenseLauncher != null) { // addExpenseLauncher가 초기화된 경우에만 호출
+            refreshContactList(); // gpt로 if문 추가 0707
+        }
     }
 
     private void refreshContactList() {
@@ -122,9 +124,14 @@ public class ExpenseFragment extends Fragment {
             long newIdx = AppDatabase.getInstance(context).getExpenseDao().insert(expense); // 새로 만든 entity contact를 넣기
             item.setIdx((int) newIdx);
 
-            // UI 갱신
+            // UI 갱신 / 기존코드
+//            getActivity().runOnUiThread(() -> {
+//                adapter.addItem(item);
+//            });
+
+            //gpt코드 0707
             getActivity().runOnUiThread(() -> {
-                adapter.addItem(item);
+                refreshContactList(); // 전체 목록을 새로 고침
             });
         }
     }
