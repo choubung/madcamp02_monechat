@@ -4,24 +4,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="16dp">
 
+    <!-- 새로운 화면의 + 버튼 -->
+    <Button
+        android:id="@+id/newChatButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+"/>
+
+    <!-- RecyclerView는 채팅 화면에만 표시 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:clipToPadding="false"/>
+        android:clipToPadding="false"
+        android:visibility="gone"/> <!-- 숨김 처리 -->
 
+    <!-- EditText는 채팅 화면에만 표시 -->
     <EditText
         android:id="@+id/input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Type a message"/>
+        android:hint="Type a message"
+        android:visibility="gone"/> <!-- 숨김 처리 -->
 
+    <!-- Send 버튼은 채팅 화면에만 표시 -->
     <Button
         android:id="@+id/sendButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send"/>
+        android:text="Send"
+        android:visibility="gone"/> <!-- 숨김 처리 -->
 </LinearLayout>

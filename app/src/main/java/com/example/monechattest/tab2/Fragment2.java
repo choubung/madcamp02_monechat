@@ -1,5 +1,6 @@
 package com.example.monechattest.tab2;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,7 @@ public class Fragment2 extends Fragment {
     private List<ChatMessage> mMessageList;
     private EditText mInputEditText;
     private Button mSendButton;
+    private Button mNewChatButton; // 새로운 채팅방 생성 버튼
 
     private OkHttpClient client;
     private WebSocket webSocket;
@@ -42,6 +44,7 @@ public class Fragment2 extends Fragment {
         mRecyclerView = rootView.findViewById(R.id.recycler_view);
         mInputEditText = rootView.findViewById(R.id.input);
         mSendButton = rootView.findViewById(R.id.sendButton);
+        mNewChatButton = rootView.findViewById(R.id.newChatButton); // 새로운 채팅방 생성 버튼
 
         mMessageList = new ArrayList<>();
         mAdapter = new ChatAdapter(mMessageList);
@@ -49,6 +52,13 @@ public class Fragment2 extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
 
         setupWebSocket();
+
+        mNewChatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showChatOptionsDialog();
+            }
+        });
 
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +72,82 @@ public class Fragment2 extends Fragment {
         });
 
         return rootView;
+    }
+
+    // 채팅방 옵션 다이얼로그 표시
+    private void showChatOptionsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("채팅방 옵션 선택");
+
+        String[] options = {"새로운 채팅방 개설", "기존 채팅방 입장"};
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                showNewChatRoomDialog();
+            } else {
+                showJoinChatRoomDialog();
+            }
+        });
+
+        builder.show();
+    }
+
+    // 새로운 채팅방 개설 다이얼로그
+    private void showNewChatRoomDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("채팅방 이름 입력");
+
+        final EditText input = new EditText(requireContext());
+        input.setHint("채팅방 이름");
+        builder.setView(input);
+
+        builder.setPositiveButton("개설", (dialog, which) -> {
+            String chatRoomName = input.getText().toString();
+            if (!chatRoomName.isEmpty()) {
+                openChatRoom(chatRoomName);
+            }
+        });
+
+        builder.setNegativeButton("취소", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    // 기존 채팅방 입장 다이얼로그
+    private void showJoinChatRoomDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("초대 코드 입력");
+
+        final EditText input = new EditText(requireContext());
+        input.setHint("초대 코드");
+        builder.setView(input);
+
+        builder.setPositiveButton("입장", (dialog, which) -> {
+            String inviteCode = input.getText().toString();
+            if (!inviteCode.isEmpty()) {
+                openChatRoom(inviteCode); // 초대 코드를 통해 채팅방 입장
+            }
+        });
+
+        builder.setNegativeButton("취소", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    // 채팅방 열기 (새로운 채팅방 개설 또는 초대 코드로 입장)
+    private void openChatRoom(String chatRoomIdentifier) {
+        // + 버튼 숨기기
+        mNewChatButton.setVisibility(View.GONE);
+
+        // 채팅 화면 표시
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mInputEditText.setVisibility(View.VISIBLE);
+        mSendButton.setVisibility(View.VISIBLE);
+
+        // WebSocket 설정
+        setupWebSocket();
+
+        // 채팅방에 입장 또는 개설 (서버에 따라 다름)
+        sendMessage("Entering or creating chat room: " + chatRoomIdentifier);
     }
 
     private void setupWebSocket() {
