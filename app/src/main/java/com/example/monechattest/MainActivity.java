@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.monechattest.tab1.Fragment1;
 import com.example.monechattest.tab2.Fragment2;
 import com.example.monechattest.tab3.Fragment3;
+import com.example.monechattest.tab4.Fragment4;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kakao.sdk.common.util.Utility;
 
@@ -21,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment1 fragment1; // 연락처탭
     Fragment2 fragment2; // 사진탭
     Fragment3 fragment3; //
-    // TODO:Fragment4 fragment4;
+    Fragment4 fragment4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         fragment1 = new Fragment1();
         fragment2 = new Fragment2();
         fragment3 = new Fragment3();
-        // TODO: fragment4 구현
+        fragment4 = new Fragment4();
 
         // 바텀 네비게이션
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_layout, fragment3).commitAllowingStateLoss();
                     return true;
                 } else if (item.getItemId() == R.id.my_page) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_layout, fragment3).commitAllowingStateLoss();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_layout, fragment4).commitAllowingStateLoss();
                     return true;
                 }
                 return true;

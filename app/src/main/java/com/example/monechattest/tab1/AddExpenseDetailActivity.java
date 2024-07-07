@@ -20,13 +20,18 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.monechattest.R;
 
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class AddExpenseDetailActivity extends AppCompatActivity {
     EditText descriptionText, amountText, dateText, memoText;
     Spinner spinner;
     Button backBtn, saveBtn;
     String[] categories = {"식사", "카페/간식", "생활/마트", "온라인쇼핑", "백화점", "금융/보험", "의료/건강", "주거/통신", "학습/교육", "교통/차량", "문화/예술/취미", "여행/숙박", "경조사/회비", "기타"};
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.KOREA); // gpt 코드
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +63,13 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /* 기존 코드
                 Intent intent = new Intent();
                 // 저장 구현(putExtra) 요망
                 setResult(RESULT_OK, intent);
-                finish();
+                finish();*/
+
+                saveExpense(); // gpt코드
             }
         });
     }
@@ -110,5 +118,28 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
                     }, year, month, day);
             datePickerDialog.show();
         });
+    }
+
+    // gpt코드
+    private void saveExpense() {
+        String description = descriptionText.getText().toString();
+        String amount = amountText.getText().toString().replace(",", "");
+        String dateStr = dateText.getText().toString();
+        String memo = memoText.getText().toString();
+        String category = spinner.getSelectedItem().toString();
+
+        Date date = null;
+        try {
+            date = dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        ExpenseItem expenseItem = new ExpenseItem(date, category, description, amount, false, memo);
+
+        Intent intent = new Intent();
+        intent.putExtra("expenseItem", expenseItem);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

@@ -73,6 +73,11 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         return expenseItems.size();
     }
 
+    public void setItems(ArrayList<ExpenseItem> items) {
+        this.expenseItems = items;
+        notifyDataSetChanged();
+    }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.clickListener = listener;
     }

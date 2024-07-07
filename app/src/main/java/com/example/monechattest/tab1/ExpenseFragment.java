@@ -56,7 +56,8 @@ public class ExpenseFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), AddExpenseDetailActivity.class);
-                startActivity(intent);
+                // startActivity(intent); // 기존 코드
+                addExpenseLauncher.launch(intent); // gpt코드
             }
         });
 
@@ -65,8 +66,6 @@ public class ExpenseFragment extends Fragment {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-
-
                         ExpenseItem newItem = (ExpenseItem) result.getData().getSerializableExtra("expenseItem");
                         if (newItem != null) {
                             new AddExpense(getActivity(), newItem).start();
@@ -112,7 +111,6 @@ public class ExpenseFragment extends Fragment {
     }
 
     class GetExpense extends Thread {
-        String TAG = "GetContact";
         private Context context;
 
         public GetExpense(Context context) {
@@ -128,6 +126,7 @@ public class ExpenseFragment extends Fragment {
                 expenseItems.add(item);
             }
             getActivity().runOnUiThread(() -> {
+                adapter.setItems(expenseItems); //gpt 코드
                 adapter.notifyDataSetChanged();
             });
         }
