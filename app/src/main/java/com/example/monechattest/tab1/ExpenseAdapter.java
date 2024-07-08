@@ -12,7 +12,10 @@ import android.widget.TextView;
 
 import com.example.monechattest.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHolder> {
     Context context;
@@ -63,12 +66,16 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ExpenseItem item = expenseItems.get(position);
 
-        holder.description.setText(item.getDescription().toString());
-        holder.date.setText(item.getDate().toString());
-        holder.category.setText(item.getCategory().toString());
+        long dateMillis = item.getDateMillis();
 
+        Date date = new Date(dateMillis);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM월 dd일", Locale.getDefault());
+        String formattedDate = sdf.format(date);
+
+        holder.description.setText(item.getDescription().toString());
+        holder.date.setText(formattedDate);
+        holder.category.setText(item.getCategory().toString());
         holder.amount.setText(item.getAmount().toString());
-        // TODO: 현명소비 버튼 어떻게 연결할건지 좀 더 생각해야됨
     }
 
     @Override

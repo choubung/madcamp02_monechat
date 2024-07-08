@@ -25,6 +25,7 @@ import com.example.monechattest.database.AppDatabase;
 import com.example.monechattest.database.ExpenseViewModel;
 import com.google.android.material.tabs.TabLayout;
 
+import java.text.NumberFormat;
 import java.util.Locale;
 
 public class Fragment1 extends Fragment {
@@ -63,7 +64,9 @@ public class Fragment1 extends Fragment {
                         @Override
                         public void onChanged(Double totalAmount) {
                             if (totalAmount != null) {
-                                totalExpenseText.setText(String.format(Locale.getDefault(), "%.0f", totalAmount));
+                                // 숫자를 세 자리마다 쉼표로 포맷팅하여 텍스트뷰에 설정
+                                String formattedAmount = NumberFormat.getInstance().format(totalAmount);
+                                totalExpenseText.setText(formattedAmount);
                             } else {
                                 totalExpenseText.setText("0");
                             }

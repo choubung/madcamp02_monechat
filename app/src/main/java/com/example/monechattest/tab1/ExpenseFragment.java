@@ -50,11 +50,12 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
             public void onItemClick(ExpenseAdapter.ViewHolder holder, View view, int position) {
                 // gpt 0708-13
                 ExpenseItem item = adapter.getItem(position);
-//                Intent intent = new Intent(getActivity(), ExpenseDetailActivity.class);
-//                intent.putExtra("expenseItem", item);
-//                startActivity(intent);
-
                 Intent intent = new Intent(getActivity(), ExpenseDetailActivity.class);
+                intent.putExtra("date", item.getDateMillis());
+                intent.putExtra("category", item.getCategory());
+                intent.putExtra("description", item.getDescription());
+                intent.putExtra("amount", item.getAmount());
+                intent.putExtra("note", item.getNote());
                 startActivity(intent);
             }
         });

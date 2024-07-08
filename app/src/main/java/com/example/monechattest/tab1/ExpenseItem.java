@@ -27,6 +27,14 @@ public class ExpenseItem implements Serializable {
         this.note = note;
     }
 
+    public long getDateMillis() {
+        return date != null ? date.getTime() : 0;
+    }
+
+    public void setDateMillis(long millis) {
+        this.date = new Date(millis);
+    }
+
     public String getAmount() {
         return amount;
     }
