@@ -26,7 +26,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpenseFragment extends Fragment {
+public class ExpenseFragment extends Fragment implements MonthlyFilterable{
     RecyclerView recyclerView;
     LinearLayoutManager layoutManager;
     ExpenseAdapter adapter;
@@ -87,16 +87,22 @@ public class ExpenseFragment extends Fragment {
     }
 
     @Override
+    public void onMonthSelected(String yearMonth) {
+        // 월별로 필터링된 데이터를 가져오는 메소드 실행
+        new GetExpense(getActivity(), yearMonth).start();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if (addExpenseLauncher != null) { // addExpenseLauncher가 초기화된 경우에만 호출
-            refreshContactList(); // gpt로 if문 추가 0707
+            refreshExpenseList(); // gpt로 if문 추가 0707
         }
     }
 
-    private void refreshContactList() {
+    private void refreshExpenseList() {
         expenseItems.clear();
-        new GetExpense(getActivity()).start();
+        new GetExpense(getActivity(), null).start(); // 전체 데이터를 로드
     }
 
     // 삭제 확인 다이얼로그 표시
@@ -131,35 +137,57 @@ public class ExpenseFragment extends Fragment {
 
             //gpt코드 0707
             getActivity().runOnUiThread(() -> {
-                refreshContactList(); // 전체 목록을 새로 고침
+                refreshExpenseList(); // 전체 목록을 새로 고침
             });
         }
     }
 
     class GetExpense extends Thread {
         private Context context;
+        private String yearMonth;
 
-        public GetExpense(Context context) {
+        public GetExpense(Context context, String yearMonth) {
             this.context = context;
+            this.yearMonth = yearMonth;
         }
 
         @Override
         public void run() {
-            List<ExpenseEntity> entities = AppDatabase.getInstance(context).getExpenseDao().getAllExpense();
-            expenseItems.clear();
-            for (ExpenseEntity entity : entities) {
-                ExpenseItem item = new ExpenseItem(entity.getIdx(), entity.getDate(), entity.getCategory(), entity.getDescription(), entity.getAmount(), entity.getNote(), entity.isSmartExpense());
-                expenseItems.add(item);
+            // 0708-09 주석처리
+            // List<ExpenseEntity> entities = AppDatabase.getInstance(context).getExpenseDao().getAllExpense();
+            List<ExpenseEntity> expenses;
+            if (yearMonth == null) {
+                expenses = AppDatabase.getInstance(context).getExpenseDao().getAllExpense();
+            } else {
+                expenses = AppDatabase.getInstance(context).getExpenseDao().getExpensesByMonth(yearMonth);
             }
+
+            ArrayList<ExpenseItem> items = new ArrayList<>();
+            for (ExpenseEntity expense : expenses) {
+                ExpenseItem item = new ExpenseItem(expense.getDescription(), expense.getDate(), expense.getCategory(), expense.getAmount(), expense.getNote());
+                item.setIdx(expense.getIdx());
+                items.add(item);
+            }
+
             getActivity().runOnUiThread(() -> {
-                adapter.setItems(expenseItems); //gpt 코드
+                expenseItems.clear();
+                expenseItems.addAll(items);
                 adapter.notifyDataSetChanged();
             });
+            // 주석처리 0708-09
+//            expenseItems.clear();
+//            for (ExpenseEntity entity : entities) {
+//                ExpenseItem item = new ExpenseItem(entity.getIdx(), entity.getDate(), entity.getCategory(), entity.getDescription(), entity.getAmount(), entity.getNote(), entity.isSmartExpense());
+//                expenseItems.add(item);
+//            }
+//            getActivity().runOnUiThread(() -> {
+//                adapter.setItems(expenseItems); //gpt 코드
+//                adapter.notifyDataSetChanged();
+//            });
         }
     }
 
     class DeleteExpense extends Thread {
-        String TAG = "DeleteContact";
         private Context context;
         private int idx; // 삭제할 연락처의 인덱스
 
@@ -174,19 +202,21 @@ public class ExpenseFragment extends Fragment {
 
             // UI 갱신
             getActivity().runOnUiThread(() -> {
-                try {
-                    for (int i = 0; i < expenseItems.size(); i++) {
-                        if (expenseItems.get(i).getIdx() == idx) {
-                            expenseItems.remove(i);
-                            // 기존 코드 adapter.removeItem(i); // 어댑터에 삭제 알림/어댑터가 관리
-                            adapter.notifyItemRemoved(i); // notifyDataSetChanged 대신 notifyItemRemoved 사용
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("DeleteExpense", "아이템 삭제 중 문제 발생");
-                }
+                //0708-09 주석처리
+//                try {
+//                    for (int i = 0; i < expenseItems.size(); i++) {
+//                        if (expenseItems.get(i).getIdx() == idx) {
+//                            expenseItems.remove(i);
+//                            // 기존 코드 adapter.removeItem(i); // 어댑터에 삭제 알림/어댑터가 관리
+//                            adapter.notifyItemRemoved(i); // notifyDataSetChanged 대신 notifyItemRemoved 사용
+//                            break;
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    Log.e("DeleteExpense", "아이템 삭제 중 문제 발생");
+//                }
+                refreshExpenseList();
             });
         }
     }

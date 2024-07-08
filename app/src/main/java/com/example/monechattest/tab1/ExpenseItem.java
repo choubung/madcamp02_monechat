@@ -19,6 +19,14 @@ public class ExpenseItem implements Serializable {
         this.isSmartExpense = isSmartExpense;
     }
 
+    public ExpenseItem(String description, Date date, String category, String amount, String note) {
+        this.description = description;
+        this.date = date;
+        this.category = category;
+        this.amount = amount;
+        this.note = note;
+    }
+
     public String getAmount() {
         return amount;
     }

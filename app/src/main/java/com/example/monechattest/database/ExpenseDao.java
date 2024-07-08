@@ -15,7 +15,10 @@ public interface ExpenseDao {
     void delete(int idx);
 
     @Query("SELECT * FROM expense")
-    List<ExpenseEntity> getAllExpense();
+    List<ExpenseEntity> getAllExpense(); // 메서드 이름 수정됨
+
+    @Query("SELECT * FROM expense WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch')) = :yearMonth")
+    List<ExpenseEntity> getExpensesByMonth(String yearMonth); // 새로운 메서드 추가
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insert(ExpenseEntity expense);

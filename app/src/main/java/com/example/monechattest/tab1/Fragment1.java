@@ -32,6 +32,7 @@ public class Fragment1 extends Fragment {
     String[] monthList = {"2024년 1월", "2024년 2월", "2024년 3월", "2024년 4월", "2024년 5월", "2024년 6월", "2024년 7월", "2024년 8월", "2024년 9월", "2024년 10월", "2024년 11월", "2024년 12월"}; // 소비내역 리스트
     private ExpenseViewModel expenseViewModel;
     private TextView totalExpenseText;
+    FragmentAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,6 +69,14 @@ public class Fragment1 extends Fragment {
                             }
                         }
                     });
+
+                    // gpt 0708-09
+                    // 프래그먼트들에게 월 정보 전달
+                    for (Fragment fragment : getChildFragmentManager().getFragments()) {
+                        if (fragment instanceof MonthlyFilterable) {
+                            ((MonthlyFilterable) fragment).onMonthSelected(yearMonth);
+                        }
+                    }
                 } catch (Exception e) {
                     Log.e("Fragment1", "Error observing monthly expense sum", e);
                 }
@@ -75,12 +84,11 @@ public class Fragment1 extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                // 아무것도 선택되지 않았을 때
                 totalExpenseText.setText("0");
             }
         });
 
-        FragmentAdapter adapter = new FragmentAdapter(getChildFragmentManager());
+        adapter = new FragmentAdapter(getChildFragmentManager());
         viewPager.setAdapter(adapter);
 
         // TabLayout을 ViewPager에 연결
