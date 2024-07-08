@@ -1,5 +1,15 @@
+import java.util.Properties;
+
 plugins {
     alias(libs.plugins.android.application)
+}
+
+val localProperties = Properties();
+val localPropertiesFile = rootProject.file("local.properties");
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { input ->
+        localProperties.load(input)
+    };
 }
 
 android {
@@ -14,6 +24,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"${localProperties.getProperty("KAKAO_NATIVE_APP_KEY")}\"");
+        buildConfigField("String", "SERVER_ADDRESS", "\"${localProperties.getProperty("SERVER_ADDRESS")}\"");
+
+        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = localProperties.getProperty("KAKAO_NATIVE_APP_KEY");
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -47,4 +66,7 @@ dependencies {
 
     implementation("com.kakao.sdk:v2-all:2.20.3") // 전체 모듈 설치, 2.11.0 버전부터 지원
     implementation ("com.kakao.sdk:v2-user:2.20.3") // 카카오 로그인 API 모듈
+
+    implementation ("com.squareup.okhttp3:okhttp:4.9.2") // okhttp 설치 모듈(http 연결 지원)
+    implementation ("org.json:json:20201115") // JSON 추출 모듈
 }
