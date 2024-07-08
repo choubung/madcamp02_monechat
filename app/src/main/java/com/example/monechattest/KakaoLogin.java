@@ -31,7 +31,7 @@ import java.io.IOException;
 public class KakaoLogin extends AppCompatActivity {
     private static final String serverAddress = BuildConfig.SERVER_ADDRESS;
     private static final String TAG = "KakaoLogin";
-    private static final String POST_URL = serverAddress + "auth/kakao/signin";
+    private static final String POST_URL = serverAddress + "/auth/kakao/signin";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private static final String PREFERENCES_NAME = "MyAppPreferences";
     private static final String JWT_TOKEN_KEY = "jwt_token";

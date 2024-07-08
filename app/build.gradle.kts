@@ -67,6 +67,7 @@ dependencies {
     implementation("com.kakao.sdk:v2-all:2.20.3") // 전체 모듈 설치, 2.11.0 버전부터 지원
     implementation ("com.kakao.sdk:v2-user:2.20.3") // 카카오 로그인 API 모듈
 
+    implementation ("io.socket:socket.io-client:2.0.1") // Socket.IO 클라이언트 라이브러리
     implementation ("com.squareup.okhttp3:okhttp:4.9.2") // okhttp 설치 모듈(http 연결 지원)
     implementation ("org.json:json:20201115") // JSON 추출 모듈
 }
