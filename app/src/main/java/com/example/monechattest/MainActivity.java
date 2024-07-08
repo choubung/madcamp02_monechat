@@ -2,10 +2,6 @@ package com.example.monechattest;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +11,6 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -27,12 +22,10 @@ import com.example.monechattest.tab2.Fragment2;
 import com.example.monechattest.tab3.Fragment3;
 import com.example.monechattest.tab4.Fragment4;
 
-// 커밋 테스트
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String CHANNEL_ID = "chat_messages";
     private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1001;
-    private ChatReceiver chatReceiver;
     // 바텀 네비게이션
     BottomNavigationView bottomNavigationView; // 하단 탭 뷰
     // 프래그먼트 변수
@@ -86,11 +79,6 @@ public class MainActivity extends AppCompatActivity {
         // Notification Channel 생성
         createNotificationChannel();
 
-        // BroadcastReceiver 등록
-        chatReceiver = new ChatReceiver();
-        IntentFilter filter = new IntentFilter("NEW_CHAT_MESSAGE");
-        registerReceiver(chatReceiver, filter);
-
         // Android 13 이상에서 알림 권한 요청
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -111,12 +99,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(chatReceiver);
-    }
-
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Chat Messages";
@@ -126,33 +108,6 @@ public class MainActivity extends AppCompatActivity {
             channel.setDescription(description);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    public class ChatReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if ("NEW_CHAT_MESSAGE".equals(intent.getAction())) {
-                String message = intent.getStringExtra("message");
-                Log.d(TAG, "New chat message: " + message);
-
-                // 알림 생성
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_chat) // 적절한 아이콘으로 변경
-                        .setContentTitle("New Chat Message")
-                        .setContentText(message)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(0, builder.build());
-
-                // 메시지를 각 탭으로 전달
-                for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-                    if (fragment instanceof ChatMessageListener) {
-                        ((ChatMessageListener) fragment).onNewChatMessage(message);
-                    }
-                }
-            }
         }
     }
 }
