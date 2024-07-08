@@ -16,6 +16,9 @@
         android:theme="@style/Theme.MoneChatTest"
         tools:targetApi="31">
         <activity
+            android:name=".tab1.IncomeDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".tab1.ExpenseDetailActivity"
             android:exported="false" />
         <activity

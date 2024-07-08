@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.example.monechattest.R;
 import com.example.monechattest.database.AppDatabase;
 import com.example.monechattest.database.ExpenseViewModel;
+import com.example.monechattest.database.IncomeViewModel;
 import com.google.android.material.tabs.TabLayout;
 
 import java.text.NumberFormat;
@@ -32,6 +33,7 @@ public class Fragment1 extends Fragment {
     Spinner spinner;
     String[] monthList = {"2024년 1월", "2024년 2월", "2024년 3월", "2024년 4월", "2024년 5월", "2024년 6월", "2024년 7월", "2024년 8월", "2024년 9월", "2024년 10월", "2024년 11월", "2024년 12월"}; // 소비내역 리스트
     private ExpenseViewModel expenseViewModel;
+    private IncomeViewModel incomeViewModel;
     private TextView totalExpenseText;
     FragmentAdapter adapter;
     private String currentSelectedMonth; // 기본 선택 값 설정 //gpt 0708-16
@@ -46,6 +48,7 @@ public class Fragment1 extends Fragment {
 
         // ViewModel 설정
         expenseViewModel = new ViewModelProvider(this).get(ExpenseViewModel.class);
+        incomeViewModel = new ViewModelProvider(this).get(IncomeViewModel.class);
 
         spinner = rootView.findViewById(R.id.spinnerMonth);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, monthList);
@@ -83,6 +86,15 @@ public class Fragment1 extends Fragment {
                 } catch (Exception e) {
                     Log.e("Fragment1", "Error observing monthly expense sum", e);
                 }
+
+                currentSelectedMonth = String.format(Locale.getDefault(), "2024-%02d", i + 1);
+                updateTotalAmount(currentSelectedMonth);
+                // 프래그먼트들에게 월 정보 전달
+                for (Fragment fragment : getChildFragmentManager().getFragments()) {
+                    if (fragment instanceof MonthlyFilterable) {
+                        ((MonthlyFilterable) fragment).onMonthSelected(currentSelectedMonth);
+                    }
+                }
             }
 
             @Override
@@ -112,7 +124,55 @@ public class Fragment1 extends Fragment {
             }
         }
 
+        // ViewPager 페이지 변경 리스너 설정
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                // Do nothing
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                updateTotalAmount(currentSelectedMonth);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                // Do nothing
+            }
+        });
+
         return rootView;
+    }
+
+    private void updateTotalAmount(String yearMonth) {
+        int currentPage = ((ViewPager) getView().findViewById(R.id.viewPager)).getCurrentItem();
+
+        if (currentPage == 0) { // 지출 페이지
+            expenseViewModel.getMonthlyExpenseSum(yearMonth).observe(getViewLifecycleOwner(), new Observer<Double>() {
+                @Override
+                public void onChanged(Double totalAmount) {
+                    if (totalAmount != null) {
+                        String formattedAmount = NumberFormat.getInstance().format(totalAmount);
+                        totalExpenseText.setText(formattedAmount);
+                    } else {
+                        totalExpenseText.setText("0");
+                    }
+                }
+            });
+        } else if (currentPage == 1) { // 수입 페이지
+            incomeViewModel.getMonthlyIncomeSum(yearMonth).observe(getViewLifecycleOwner(), new Observer<Double>() {
+                @Override
+                public void onChanged(Double totalAmount) {
+                    if (totalAmount != null) {
+                        String formattedAmount = NumberFormat.getInstance().format(totalAmount);
+                        totalExpenseText.setText(formattedAmount);
+                    } else {
+                        totalExpenseText.setText("0");
+                    }
+                }
+            });
+        }
     }
 
     public void updateMonthlyExpense(String yearMonth) {
@@ -140,5 +200,9 @@ public class Fragment1 extends Fragment {
         tabTextView.setTextColor(Color.parseColor("#666666")); // 기본 텍스트 색상
         tabTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         return tabTextView;
+    }
+
+    public void updateMonthlyIncome(String yearMonth) {
+        updateTotalAmount(yearMonth);
     }
 }

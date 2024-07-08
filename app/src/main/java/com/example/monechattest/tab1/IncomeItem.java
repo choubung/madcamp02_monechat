@@ -17,7 +17,21 @@ public class IncomeItem implements Serializable {
         this.note = note;
     }
 
-    // getter and setter
+    public IncomeItem(String description, Date date, String category, String amount, String note) {
+        this.description = description;
+        this.date = date;
+        this.category = category;
+        this.amount = amount;
+        this.note = note;
+    }
+
+    public long getDateMillis() {
+        return date != null ? date.getTime() : 0;
+    }
+
+    public void setDateMillis(long millis) {
+        this.date = new Date(millis);
+    }
 
     public String getAmount() {
         return amount;

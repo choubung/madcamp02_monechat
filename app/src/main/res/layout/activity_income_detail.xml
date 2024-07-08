@@ -2,12 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp"
-    android:background="@color/white"
-    tools:context=".tab1.AddIncomeDetailActivity">
+    android:background="@color/white">
 
     <Button
         android:id="@+id/back"
@@ -19,11 +17,10 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="수입 상세내역 입력"
+        android:text="수입 상세내역"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,12 +58,14 @@
                     android:padding="5dp"
                     android:src="@drawable/icon_filter"/>
 
-                <Spinner
-                    android:id="@+id/spinner"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/categoryText"
+                    android:text="식사"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_gravity="bottom"/>
+                    android:layout_gravity="center_vertical"
+                    android:textSize="13sp"/>
 
             </LinearLayout>
 
@@ -82,12 +81,13 @@
                     android:padding="5dp"
                     android:src="@drawable/icon_description"/>
 
-                <EditText
+                <TextView
                     android:id="@+id/descriptionText"
+                    android:text="카이마루"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="내역"
+                    android:layout_gravity="center_vertical"
                     android:textSize="13sp"/>
 
             </LinearLayout>
@@ -104,14 +104,14 @@
                     android:padding="5dp"
                     android:src="@drawable/icon_coins"/>
 
-                <EditText
+                <TextView
                     android:id="@+id/amountText"
+                    android:text="12,500"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="금액"
-                    android:textSize="13sp"
-                    android:inputType="numberDecimal"/>
+                    android:layout_gravity="center_vertical"
+                    android:textSize="13sp"/>
 
             </LinearLayout>
 
@@ -127,37 +127,25 @@
                     android:padding="5dp"
                     android:src="@drawable/icon_calender"/>
 
-                <EditText
+                <TextView
                     android:id="@+id/dateText"
+                    android:text="2024/07/10"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="날짜"
-                    android:textSize="13sp"
-                    android:focusable="false"
-                    android:clickable="true"/>
+                    android:layout_gravity="center_vertical"
+                    android:textSize="13sp"/>
 
             </LinearLayout>
 
-            <EditText
+            <TextView
                 android:id="@+id/memoText"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:hint="메모를 입력하세요..."
                 android:textSize="13sp"
                 android:padding="15dp"
                 android:gravity="top"
                 android:background="@drawable/memo_background"/>
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/btnSave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
-        android:text="저장"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
