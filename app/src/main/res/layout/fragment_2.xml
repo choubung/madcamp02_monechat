@@ -1,14 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tab2.Fragment2">
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- 새로운 화면의 + 버튼 -->
+    <Button
+        android:id="@+id/newChatButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+"/>
+
+    <!-- RecyclerView는 채팅 화면에만 표시 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="frag2" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:visibility="gone"/> <!-- 숨김 처리 -->
 
-</FrameLayout>
+    <!-- EditText는 채팅 화면에만 표시 -->
+    <EditText
+        android:id="@+id/input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Type a message"
+        android:visibility="gone"/> <!-- 숨김 처리 -->
+
+    <!-- Send 버튼은 채팅 화면에만 표시 -->
+    <Button
+        android:id="@+id/sendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:visibility="gone"/> <!-- 숨김 처리 -->
+</LinearLayout>
