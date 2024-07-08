@@ -38,19 +38,25 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_expense_detail);
 
+        // EditText 초기화
         descriptionText = findViewById(R.id.descriptionText);
         amountText = findViewById(R.id.amountText);
         dateText = findViewById(R.id.dateText);
         memoText = findViewById(R.id.memoText);
 
+        // Spinner 초기화
         spinner = findViewById(R.id.spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
+        // 금액 포맷 설정 메서드 호출
         setupAmountFormatting();
+
+        // 날짜 선택기 설정 메서드 호출
         setupDatePicker();
 
+        // '뒤로 가기' 버튼 설정
         backBtn = findViewById(R.id.back);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +65,7 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
             }
         });
 
+        // '저장' 버튼 설정
         saveBtn = findViewById(R.id.btnSave);
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,11 +76,13 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
                 setResult(RESULT_OK, intent);
                 finish();*/
 
+                // 저장 처리 메서드 호출
                 saveExpense(); // gpt코드
             }
         });
     }
 
+    // 금액 입력 시 포맷을 지정하는 메서드
     private void setupAmountFormatting() { // 문제 없을듯
         amountText.addTextChangedListener(new TextWatcher() {
             private String current = "";
@@ -104,6 +113,7 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         });
     }
 
+    // 날짜 선택기 설정 메서드
     private void setupDatePicker() {
         dateText.setOnClickListener(v -> {
             final Calendar calendar = Calendar.getInstance();
@@ -120,7 +130,7 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         });
     }
 
-    // gpt코드
+    // 지출 정보를 저장하는 메서드
     private void saveExpense() {
         String description = descriptionText.getText().toString();
         String amount = amountText.getText().toString().replace(",","");
@@ -135,9 +145,10 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // ExpenseItem 객체 생성
         ExpenseItem expenseItem = new ExpenseItem(0, date, category, description, amount, memo, false);
 
-        // intent에 담아서 소비 리스트쪽으로
+        // Intent에 데이터 추가하여 반환
         Intent intent = new Intent();
         intent.putExtra("expenseItem", expenseItem);
         setResult(RESULT_OK, intent);

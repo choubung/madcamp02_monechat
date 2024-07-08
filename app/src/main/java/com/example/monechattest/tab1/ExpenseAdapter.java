@@ -24,21 +24,24 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         return expenseItems.get(position);
     }
 
-    //아이템 추가와 삭제를 어댑터에서 직접 관리
+    // 아이템 추가 메서드
     public void addItem(ExpenseItem item) {
         expenseItems.add(item);
         notifyItemInserted(expenseItems.size() - 1);
     }
 
+    // 아이템 삭제 메서드
     public void removeItem(int position) {
         expenseItems.remove(position);
         notifyItemRemoved(position);
     }
 
+    // 클릭 리스너 인터페이스
     public interface OnItemClickListener {
         void onItemClick(ViewHolder holder, View view, int position);
     }
 
+    // 길게 누르기 리스너 인터페이스 추가
     public interface OnItemLongClickListener {  // 길게 누르기 리스너 인터페이스 추가
         void onItemLongClick(ViewHolder holder, View view, int position);
     }
@@ -61,7 +64,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         ExpenseItem item = expenseItems.get(position);
 
         holder.description.setText(item.getDescription().toString());
-        holder.date.setText(item.getDate().toString()); // TODO:date를 텍스트로 어떻게 가져오는 지 알아볼 필요 있음
+        holder.date.setText(item.getDate().toString());
         holder.category.setText(item.getCategory().toString());
 
         holder.amount.setText(item.getAmount().toString());
@@ -73,19 +76,23 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         return expenseItems.size();
     }
 
+    // 아이템 리스트를 설정하는 메서드
     public void setItems(ArrayList<ExpenseItem> items) {
         this.expenseItems = items;
         notifyDataSetChanged();
     }
 
+    // 아이템 클릭 리스너 설정 메서드
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.clickListener = listener;
     }
 
+    // 아이템 길게 누르기 리스너 설정 메서드
     public void setOnItemLongClickListener(OnItemLongClickListener listener) {  // 길게 누르기 리스너 설정 메서드
         this.longClickListener = listener;
     }
 
+    // 뷰 홀더 클래스
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView categoryImage;
         TextView date, category, description, amount;

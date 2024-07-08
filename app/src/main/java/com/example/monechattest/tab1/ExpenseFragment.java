@@ -48,7 +48,14 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
         adapter.setOnItemClickListener(new ExpenseAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(ExpenseAdapter.ViewHolder holder, View view, int position) {
-                // TODO: 클릭시 보여주는 페이지 구현해야함
+                // gpt 0708-13
+                ExpenseItem item = adapter.getItem(position);
+//                Intent intent = new Intent(getActivity(), ExpenseDetailActivity.class);
+//                intent.putExtra("expenseItem", item);
+//                startActivity(intent);
+
+                Intent intent = new Intent(getActivity(), ExpenseDetailActivity.class);
+                startActivity(intent);
             }
         });
 
