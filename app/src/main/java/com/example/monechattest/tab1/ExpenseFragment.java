@@ -24,6 +24,8 @@ import com.example.monechattest.database.ExpenseEntity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ExpenseFragment extends Fragment implements MonthlyFilterable{
@@ -33,6 +35,7 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
     ArrayList<ExpenseItem> expenseItems = new ArrayList<>();
     FloatingActionButton fab;
     private ActivityResultLauncher<Intent> addExpenseLauncher;
+    String currentSelectedMonth; // 현재 선택된 월을 저장할 변수
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -96,7 +99,8 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
 
     @Override
     public void onMonthSelected(String yearMonth) {
-        // 월별로 필터링된 데이터를 가져오는 메소드 실행
+        // 전달받은 월별로 필터링된 데이터를 가져오는 메소드 실행
+        currentSelectedMonth = yearMonth; // 현재 선택된 월 업데이트
         new GetExpense(getActivity(), yearMonth).start();
     }
 
@@ -109,9 +113,13 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
     }
 
     private void refreshExpenseList() {
-        expenseItems.clear();
-        new GetExpense(getActivity(), null).start(); // 전체 데이터를 로드
+        if (currentSelectedMonth != null) {
+            new GetExpense(getActivity(), currentSelectedMonth).start();
+        } else {
+            new GetExpense(getActivity(), null).start();
+        }
     }
+
 
     // 삭제 확인 다이얼로그 표시
     private void showDeleteConfirmationDialog(ExpenseItem item) {
@@ -144,8 +152,16 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
 //            });
 
             //gpt코드 0707
+            //getActivity().runOnUiThread(() -> {
+             //   ((Fragment1)getParentFragment()).updateMonthlyExpense(currentSelectedMonth);
+            //});
+
+            // UI 갱신
             getActivity().runOnUiThread(() -> {
-                refreshExpenseList(); // 전체 목록을 새로 고침
+                refreshExpenseList(); // 새로운 데이터가 추가되었으므로, 리스트를 새로고침
+                if (getParentFragment() instanceof Fragment1) {
+                    ((Fragment1) getParentFragment()).updateMonthlyExpense(currentSelectedMonth);
+                }
             });
         }
     }
@@ -163,6 +179,7 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
         public void run() {
             // 0708-09 주석처리
             // List<ExpenseEntity> entities = AppDatabase.getInstance(context).getExpenseDao().getAllExpense();
+
             List<ExpenseEntity> expenses;
             if (yearMonth == null) {
                 expenses = AppDatabase.getInstance(context).getExpenseDao().getAllExpense();
@@ -176,6 +193,14 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
                 item.setIdx(expense.getIdx());
                 items.add(item);
             }
+
+            // 정렬 후 UI 갱신
+            Collections.sort(items, new Comparator<ExpenseItem>() {
+                @Override
+                public int compare(ExpenseItem item1, ExpenseItem item2) {
+                    return Long.compare(item2.getDateMillis(), item1.getDateMillis()); // 최신 순으로 정렬
+                }
+            });
 
             getActivity().runOnUiThread(() -> {
                 expenseItems.clear();
@@ -209,7 +234,7 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
             AppDatabase.getInstance(context).getExpenseDao().delete(idx);
 
             // UI 갱신
-            getActivity().runOnUiThread(() -> {
+            /*getActivity().runOnUiThread(() -> {
                 //0708-09 주석처리
 //                try {
 //                    for (int i = 0; i < expenseItems.size(); i++) {
@@ -224,7 +249,16 @@ public class ExpenseFragment extends Fragment implements MonthlyFilterable{
 //                    e.printStackTrace();
 //                    Log.e("DeleteExpense", "아이템 삭제 중 문제 발생");
 //                }
-                refreshExpenseList();
+                ((Fragment1)getParentFragment()).updateMonthlyExpense(currentSelectedMonth);
+            });
+             */
+
+            // UI 갱신
+            getActivity().runOnUiThread(() -> {
+                refreshExpenseList(); // 데이터가 삭제되었으므로, 리스트를 새로고침
+                if (getParentFragment() instanceof Fragment1) {
+                    ((Fragment1) getParentFragment()).updateMonthlyExpense(currentSelectedMonth);
+                }
             });
         }
     }

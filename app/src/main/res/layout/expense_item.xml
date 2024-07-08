@@ -69,7 +69,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:layout_weight="1"
                 android:gravity="right">
 
                 <TextView
@@ -80,12 +79,6 @@
                     android:text="9,000원"
                     android:textSize="21sp"/>
 
-                <Button
-                    android:id="@+id/isSmartExpense"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="8dp"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

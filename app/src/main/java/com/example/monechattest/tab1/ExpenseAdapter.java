@@ -12,8 +12,11 @@ import android.widget.TextView;
 
 import com.example.monechattest.R;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -52,6 +55,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
     public ExpenseAdapter(Context context, ArrayList<ExpenseItem> expenseItems) {
         this.context = context;
         this.expenseItems = expenseItems;
+        sortItemsByDate();  // 초기 데이터 정렬
     }
 
     @NonNull
@@ -69,13 +73,22 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         long dateMillis = item.getDateMillis();
 
         Date date = new Date(dateMillis);
-        SimpleDateFormat sdf = new SimpleDateFormat("MM월 dd일", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd", Locale.getDefault());
         String formattedDate = sdf.format(date);
 
         holder.description.setText(item.getDescription().toString());
         holder.date.setText(formattedDate);
         holder.category.setText(item.getCategory().toString());
-        holder.amount.setText(item.getAmount().toString());
+
+        // 금액 포맷팅
+        try {
+            double amountValue = Double.parseDouble(item.getAmount().toString());
+            String formattedAmount = NumberFormat.getNumberInstance(Locale.getDefault()).format(amountValue);
+            holder.amount.setText(formattedAmount);
+        } catch (NumberFormatException e) {
+            // 금액 파싱 오류가 발생할 경우 원래 문자열을 그대로 설정
+            holder.amount.setText(item.getAmount().toString());
+        }
     }
 
     @Override
@@ -99,6 +112,16 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         this.longClickListener = listener;
     }
 
+    // 날짜 기준으로 아이템 정렬
+    private void sortItemsByDate() {
+        Collections.sort(expenseItems, new Comparator<ExpenseItem>() {
+            @Override
+            public int compare(ExpenseItem item1, ExpenseItem item2) {
+                return Long.compare(item2.getDateMillis(), item1.getDateMillis());
+            }
+        });
+    }
+
     // 뷰 홀더 클래스
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView categoryImage;
@@ -115,7 +138,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
             category = itemView.findViewById(R.id.category);
 
             amount = itemView.findViewById(R.id.amount);
-            isSmartExpense = itemView.findViewById(R.id.isSmartExpense);
+//            isSmartExpense = itemView.findViewById(R.id.isSmartExpense);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -17,8 +17,11 @@ public interface ExpenseDao {
     @Query("SELECT * FROM expense")
     List<ExpenseEntity> getAllExpense(); // 메서드 이름 수정됨
 
-    @Query("SELECT * FROM expense WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch')) = :yearMonth")
-    List<ExpenseEntity> getExpensesByMonth(String yearMonth); // 새로운 메서드 추가
+    @Query("SELECT * FROM expense WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch', 'localtime')) = :yearMonth")
+    List<ExpenseEntity> getExpensesByMonth(String yearMonth);
+
+    @Query("SELECT SUM(amount) FROM expense WHERE date BETWEEN :startOfMonth AND :endOfMonth")
+    LiveData<Double> getTotalForMonthLiveData(long startOfMonth, long endOfMonth);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insert(ExpenseEntity expense);

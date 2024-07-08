@@ -34,6 +34,7 @@ public class Fragment1 extends Fragment {
     private ExpenseViewModel expenseViewModel;
     private TextView totalExpenseText;
     FragmentAdapter adapter;
+    private String currentSelectedMonth; // 기본 선택 값 설정 //gpt 0708-16
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,10 +58,10 @@ public class Fragment1 extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 try {
                     // 스피너에서 선택된 값에 따라 yearMonth 문자열 생성
-                    String yearMonth = String.format(Locale.getDefault(), "2024-%02d", i + 1);
+                    currentSelectedMonth = String.format(Locale.getDefault(), "2024-%02d", i + 1);
 
                     // 옵저버 등록
-                    expenseViewModel.getMonthlyExpenseSum(yearMonth).observe(getViewLifecycleOwner(), new Observer<Double>() {
+                    expenseViewModel.getMonthlyExpenseSum(currentSelectedMonth).observe(getViewLifecycleOwner(), new Observer<Double>() {
                         @Override
                         public void onChanged(Double totalAmount) {
                             if (totalAmount != null) {
@@ -73,11 +74,10 @@ public class Fragment1 extends Fragment {
                         }
                     });
 
-                    // gpt 0708-09
                     // 프래그먼트들에게 월 정보 전달
                     for (Fragment fragment : getChildFragmentManager().getFragments()) {
                         if (fragment instanceof MonthlyFilterable) {
-                            ((MonthlyFilterable) fragment).onMonthSelected(yearMonth);
+                            ((MonthlyFilterable) fragment).onMonthSelected(currentSelectedMonth);
                         }
                     }
                 } catch (Exception e) {
@@ -113,6 +113,15 @@ public class Fragment1 extends Fragment {
         }
 
         return rootView;
+    }
+
+    public void updateMonthlyExpense(String yearMonth) {
+        // MonthlyFilterable 인터페이스를 구현하는 모든 자식 프래그먼트에게 월별 데이터를 전달
+        for (Fragment fragment : getChildFragmentManager().getFragments()) {
+            if (fragment instanceof MonthlyFilterable) {
+                ((MonthlyFilterable) fragment).onMonthSelected(yearMonth);
+            }
+        }
     }
 
     // 월별 총합을 가져오는 메소드 gpt (240707)
