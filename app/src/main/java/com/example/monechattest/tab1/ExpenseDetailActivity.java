@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import com.example.monechattest.R;
-
+// 뭐지?
 public class ExpenseDetailActivity extends AppCompatActivity {
     TextView descriptionTextView, dateTextView, categoryTextView, amountTextView, noteTextView;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
