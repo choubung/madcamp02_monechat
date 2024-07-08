@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,12 +52,21 @@ public class ExpenseFragment extends Fragment {
             }
         });
 
+        adapter.setOnItemLongClickListener(new ExpenseAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(ExpenseAdapter.ViewHolder holder, View view, int position) {
+                ExpenseItem item = adapter.getItem(position);
+                showDeleteConfirmationDialog(item);
+            }
+        });
+
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab_btn);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), AddExpenseDetailActivity.class);
-                startActivity(intent);
+                // startActivity(intent); // 기존 코드
+                addExpenseLauncher.launch(intent); // gpt코드
             }
         });
 
@@ -65,8 +75,6 @@ public class ExpenseFragment extends Fragment {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-
-
                         ExpenseItem newItem = (ExpenseItem) result.getData().getSerializableExtra("expenseItem");
                         if (newItem != null) {
                             new AddExpense(getActivity(), newItem).start();
@@ -81,12 +89,24 @@ public class ExpenseFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        refreshContactList();
+        if (addExpenseLauncher != null) { // addExpenseLauncher가 초기화된 경우에만 호출
+            refreshContactList(); // gpt로 if문 추가 0707
+        }
     }
 
     private void refreshContactList() {
         expenseItems.clear();
         new GetExpense(getActivity()).start();
+    }
+
+    // 삭제 확인 다이얼로그 표시
+    private void showDeleteConfirmationDialog(ExpenseItem item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("삭제 확인")
+                .setMessage(item.getDescription() + " 내역을 삭제하시겠습니까?")
+                .setPositiveButton("삭제", (dialogInterface, i) -> new DeleteExpense(getActivity(), item.getIdx()).start())
+                .setNegativeButton("취소", null)
+                .show();
     }
 
     class AddExpense extends Thread {
@@ -104,15 +124,19 @@ public class ExpenseFragment extends Fragment {
             long newIdx = AppDatabase.getInstance(context).getExpenseDao().insert(expense); // 새로 만든 entity contact를 넣기
             item.setIdx((int) newIdx);
 
-            // UI 갱신
+            // UI 갱신 / 기존코드
+//            getActivity().runOnUiThread(() -> {
+//                adapter.addItem(item);
+//            });
+
+            //gpt코드 0707
             getActivity().runOnUiThread(() -> {
-                adapter.addItem(item);
+                refreshContactList(); // 전체 목록을 새로 고침
             });
         }
     }
 
     class GetExpense extends Thread {
-        String TAG = "GetContact";
         private Context context;
 
         public GetExpense(Context context) {
@@ -128,6 +152,7 @@ public class ExpenseFragment extends Fragment {
                 expenseItems.add(item);
             }
             getActivity().runOnUiThread(() -> {
+                adapter.setItems(expenseItems); //gpt 코드
                 adapter.notifyDataSetChanged();
             });
         }
@@ -145,18 +170,22 @@ public class ExpenseFragment extends Fragment {
 
         @Override
         public void run() {
-            Log.d(TAG, "실행 시작");
             AppDatabase.getInstance(context).getExpenseDao().delete(idx);
-            Log.d(TAG, "DB 삭제");
 
             // UI 갱신
             getActivity().runOnUiThread(() -> {
-                for (int i = 0; i < expenseItems.size(); i++) {
-                    if (expenseItems.get(i).getIdx() == idx) {
-                        expenseItems.remove(i);
-                        adapter.removeItem(i); // 어댑터에 삭제 알림/어댑터가 관리
-                        break;
+                try {
+                    for (int i = 0; i < expenseItems.size(); i++) {
+                        if (expenseItems.get(i).getIdx() == idx) {
+                            expenseItems.remove(i);
+                            // 기존 코드 adapter.removeItem(i); // 어댑터에 삭제 알림/어댑터가 관리
+                            adapter.notifyItemRemoved(i); // notifyDataSetChanged 대신 notifyItemRemoved 사용
+                            break;
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("DeleteExpense", "아이템 삭제 중 문제 발생");
                 }
             });
         }
