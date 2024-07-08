@@ -64,7 +64,7 @@
 
         <receiver android:name=".ChatReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="NEW_CHAT_MESSAGE" />
             </intent-filter>
