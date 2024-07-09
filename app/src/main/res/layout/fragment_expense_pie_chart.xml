@@ -9,8 +9,12 @@
         android:id="@+id/spinnerMonth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp" />
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:gravity="left"
+        android:textSize="20sp" />
 
     <com.anychart.AnyChartView
         android:id="@+id/any_chart_view"
