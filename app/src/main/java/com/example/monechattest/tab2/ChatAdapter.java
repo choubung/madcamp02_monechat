@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.example.monechattest.R;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
@@ -103,7 +104,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             messageTextView.setText(message.getMessage());
             userNameTextView.setText(message.getUserName());
             timestampTextView.setText(message.getTimestamp());
-            if (message.getProfileImage() != null && !message.getProfileImage().isEmpty()) {
+            if (!Objects.equals(message.getProfileImage(), "") && !message.getProfileImage().isEmpty()) {
                 Glide.with(itemView.getContext())
                         .load(message.getProfileImage())
                         .into(profileImageView);
