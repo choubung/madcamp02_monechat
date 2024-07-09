@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder> {
@@ -25,6 +26,9 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder
     ArrayList<IncomeItem> incomeItems;
     IncomeAdapter.OnItemClickListener clickListener;
     IncomeAdapter.OnItemLongClickListener longClickListener;  // 길게 누르기 리스너 추가
+
+    // 카테고리와 이미지 리소스 ID 매핑
+    private HashMap<String, Integer> categoryImageMap = new HashMap<>();
 
     public IncomeItem getItem(int position) {
         return incomeItems.get(position);
@@ -44,30 +48,31 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder
 
     // 클릭 리스너 인터페이스
     public interface OnItemClickListener {
-        void onItemClick(IncomeAdapter.ViewHolder holder, View view, int position);
+        void onItemClick(ViewHolder holder, View view, int position);
     }
 
     // 길게 누르기 리스너 인터페이스 추가
     public interface OnItemLongClickListener {  // 길게 누르기 리스너 인터페이스 추가
-        void onItemLongClick(IncomeAdapter.ViewHolder holder, View view, int position);
+        void onItemLongClick(ViewHolder holder, View view, int position);
     }
 
     public IncomeAdapter(Context context, ArrayList<IncomeItem> incomeItems) {
         this.context = context;
         this.incomeItems = incomeItems;
         sortItemsByDate();  // 초기 데이터 정렬
+        initializeCategoryImageMap(); // 카테고리 이미지 매핑 초기화
     }
 
     @NonNull
     @Override
-    public IncomeAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemView = inflater.inflate(R.layout.income_item, parent, false);
         return new IncomeAdapter.ViewHolder(itemView, clickListener, longClickListener);  // 생성자에 리스너 전달
     }
 
     @Override
-    public void onBindViewHolder(@NonNull IncomeAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         IncomeItem item = incomeItems.get(position);
 
         long dateMillis = item.getDateMillis();
@@ -88,6 +93,14 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder
         } catch (NumberFormatException e) {
             // 금액 파싱 오류가 발생할 경우 원래 문자열을 그대로 설정
             holder.amount.setText(item.getAmount().toString());
+        }
+
+        // 카테고리에 따라 이미지 설정
+        Integer imageResId = categoryImageMap.get(item.getCategory());
+        if (imageResId != null) {
+            holder.categoryImage.setImageResource(imageResId);
+        } else {
+            holder.categoryImage.setImageResource(R.drawable.ic_launcher_foreground); // 기본 이미지
         }
     }
 
@@ -122,21 +135,25 @@ public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder
         });
     }
 
+    // 카테고리와 이미지 리소스를 매핑하는 메서드
+    private void initializeCategoryImageMap() {
+        categoryImageMap.put("주수입", R.drawable.icon_income_main);
+        categoryImageMap.put("부수입", R.drawable.icon_income_additional);
+        categoryImageMap.put("기타수입", R.drawable.icon_income_else);
+    }
+
     // 뷰 홀더 클래스
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView categoryImage;
         TextView date, category, description, amount;
-        Button isSmartIncome; // TODO: 현명 소비 화면에 어떤 방식으로 띄울 건지 구체적으로 정해야함 (drawable)
 
         public ViewHolder(@NonNull View itemView, final IncomeAdapter.OnItemClickListener clickListener, final IncomeAdapter.OnItemLongClickListener longClickListener) {  // 생성자에서 리스너 전달받음
             super(itemView);
 
             categoryImage = itemView.findViewById(R.id.categoryImage);
-
             description = itemView.findViewById(R.id.description);
             date = itemView.findViewById(R.id.date);
             category = itemView.findViewById(R.id.category);
-
             amount = itemView.findViewById(R.id.amount);
 //            isSmartIncome = itemView.findViewById(R.id.isSmartIncome);
 

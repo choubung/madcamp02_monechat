@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.activity.EdgeToEdge;
@@ -24,14 +26,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class AddIncomeDetailActivity extends AppCompatActivity {
     EditText descriptionText, amountText, dateText, memoText;
+    ImageView categoryImage;
     Spinner spinner;
     Button backBtn, saveBtn;
     String[] categories = {"주수입", "부수입", "기타수입"};
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.KOREA);
+
+    // 카테고리와 이미지 리소스 ID 매핑
+    private HashMap<String, Integer> categoryImageMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +50,30 @@ public class AddIncomeDetailActivity extends AppCompatActivity {
         amountText = findViewById(R.id.amountText);
         dateText = findViewById(R.id.dateText);
         memoText = findViewById(R.id.memoText);
+        categoryImage = findViewById(R.id.categoryImage);
+
+        initializeCategoryImageMap();
 
         // Spinner 초기화
         spinner = findViewById(R.id.spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
+        // Spinner 선택 리스너 설정
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedCategory = categories[position];
+                updateCategoryImage(selectedCategory);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // 선택되지 않았을 때 기본 이미지 설정
+                categoryImage.setImageResource(R.drawable.ic_launcher_foreground);
+            }
+        });
 
         // 금액 포맷 설정 메서드 호출
         setupAmountFormatting();
@@ -80,6 +105,23 @@ public class AddIncomeDetailActivity extends AppCompatActivity {
                 saveIncome(); // gpt코드
             }
         });
+    }
+
+    // 카테고리 이미지 업데이트 메서드
+    private void updateCategoryImage(String category) {
+        Integer imageResId = categoryImageMap.get(category);
+        if (imageResId != null) {
+            categoryImage.setImageResource(imageResId);
+        } else {
+            categoryImage.setImageResource(R.drawable.ic_launcher_foreground); // 기본 이미지
+        }
+    }
+
+    // 카테고리와 이미지 리소스를 매핑하는 메서드
+    private void initializeCategoryImageMap() {
+        categoryImageMap.put("주수입", R.drawable.icon_income_main);
+        categoryImageMap.put("부수입", R.drawable.icon_income_additional);
+        categoryImageMap.put("기타수입", R.drawable.icon_income_else);
     }
 
     // 금액 입력 시 포맷을 지정하는 메서드
