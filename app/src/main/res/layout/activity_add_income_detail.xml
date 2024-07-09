@@ -56,9 +56,11 @@
                 android:layout_marginBottom="15dp">
 
                 <ImageView
+                    android:id="@+id/categoryImage"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_launcher_foreground"/>
+                    android:padding="5dp"
+                    android:src="@drawable/icon_filter"/>
 
                 <Spinner
                     android:id="@+id/spinner"
@@ -82,7 +84,7 @@
                     android:src="@drawable/icon_description"/>
 
                 <EditText
-                    android:id="@+id/etDescription"
+                    android:id="@+id/descriptionText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -104,7 +106,7 @@
                     android:src="@drawable/icon_coins"/>
 
                 <EditText
-                    android:id="@+id/etAmount"
+                    android:id="@+id/amountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -127,7 +129,7 @@
                     android:src="@drawable/icon_calender"/>
 
                 <EditText
-                    android:id="@+id/etDate"
+                    android:id="@+id/dateText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -139,7 +141,7 @@
             </LinearLayout>
 
             <EditText
-                android:id="@+id/etMemo"
+                android:id="@+id/memoText"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:hint="메모를 입력하세요..."

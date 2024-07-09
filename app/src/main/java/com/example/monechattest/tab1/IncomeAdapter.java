@@ -21,35 +21,28 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHolder> {
+public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder> {
     Context context;
-    ArrayList<ExpenseItem> expenseItems;
-    OnItemClickListener clickListener;
-    OnItemLongClickListener longClickListener;  // 길게 누르기 리스너 추가
+    ArrayList<IncomeItem> incomeItems;
+    IncomeAdapter.OnItemClickListener clickListener;
+    IncomeAdapter.OnItemLongClickListener longClickListener;  // 길게 누르기 리스너 추가
 
-    // 이미지 리소스 매핑
+    // 카테고리와 이미지 리소스 ID 매핑
     private HashMap<String, Integer> categoryImageMap = new HashMap<>();
 
-    public ExpenseAdapter(Context context, ArrayList<ExpenseItem> expenseItems) {
-        this.context = context;
-        this.expenseItems = expenseItems;
-        sortItemsByDate();  // 초기 데이터 정렬
-        initializeCategoryImageMap(); // 이미지 매핑 초기화
-    }
-
-    public ExpenseItem getItem(int position) {
-        return expenseItems.get(position);
+    public IncomeItem getItem(int position) {
+        return incomeItems.get(position);
     }
 
     // 아이템 추가 메서드
-    public void addItem(ExpenseItem item) {
-        expenseItems.add(item);
-        notifyItemInserted(expenseItems.size() - 1);
+    public void addItem(IncomeItem item) {
+        incomeItems.add(item);
+        notifyItemInserted(incomeItems.size() - 1);
     }
 
     // 아이템 삭제 메서드
     public void removeItem(int position) {
-        expenseItems.remove(position);
+        incomeItems.remove(position);
         notifyItemRemoved(position);
     }
 
@@ -63,19 +56,27 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         void onItemLongClick(ViewHolder holder, View view, int position);
     }
 
+    public IncomeAdapter(Context context, ArrayList<IncomeItem> incomeItems) {
+        this.context = context;
+        this.incomeItems = incomeItems;
+        sortItemsByDate();  // 초기 데이터 정렬
+        initializeCategoryImageMap(); // 카테고리 이미지 매핑 초기화
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View itemView = inflater.inflate(R.layout.expense_item, parent, false);
-        return new ViewHolder(itemView, clickListener, longClickListener);  // 생성자에 리스너 전달
+        View itemView = inflater.inflate(R.layout.income_item, parent, false);
+        return new IncomeAdapter.ViewHolder(itemView, clickListener, longClickListener);  // 생성자에 리스너 전달
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ExpenseItem item = expenseItems.get(position);
+        IncomeItem item = incomeItems.get(position);
 
         long dateMillis = item.getDateMillis();
+
         Date date = new Date(dateMillis);
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd", Locale.getDefault());
         String formattedDate = sdf.format(date);
@@ -105,51 +106,40 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return expenseItems.size();
+        return incomeItems.size();
     }
 
     // 아이템 리스트를 설정하는 메서드
-    public void setItems(ArrayList<ExpenseItem> items) {
-        this.expenseItems = items;
+    public void setItems(ArrayList<IncomeItem> items) {
+        this.incomeItems = items;
         notifyDataSetChanged();
     }
 
     // 아이템 클릭 리스너 설정 메서드
-    public void setOnItemClickListener(OnItemClickListener listener) {
+    public void setOnItemClickListener(IncomeAdapter.OnItemClickListener listener) {
         this.clickListener = listener;
     }
 
     // 아이템 길게 누르기 리스너 설정 메서드
-    public void setOnItemLongClickListener(OnItemLongClickListener listener) {  // 길게 누르기 리스너 설정 메서드
+    public void setOnItemLongClickListener(IncomeAdapter.OnItemLongClickListener listener) {  // 길게 누르기 리스너 설정 메서드
         this.longClickListener = listener;
     }
 
     // 날짜 기준으로 아이템 정렬
     private void sortItemsByDate() {
-        Collections.sort(expenseItems, new Comparator<ExpenseItem>() {
+        Collections.sort(incomeItems, new Comparator<IncomeItem>() {
             @Override
-            public int compare(ExpenseItem item1, ExpenseItem item2) {
+            public int compare(IncomeItem item1, IncomeItem item2) {
                 return Long.compare(item2.getDateMillis(), item1.getDateMillis());
             }
         });
     }
 
-    // 카테고리와 이미지 리소스 ID를 매핑하는 메서드
+    // 카테고리와 이미지 리소스를 매핑하는 메서드
     private void initializeCategoryImageMap() {
-        categoryImageMap.put("식사", R.drawable.icon_expense_meal);
-        categoryImageMap.put("카페/간식", R.drawable.icon_expense_cafe);
-        categoryImageMap.put("생활/마트", R.drawable.icon_expense_market);
-        categoryImageMap.put("온라인쇼핑", R.drawable.icon_expense_online);
-        categoryImageMap.put("백화점", R.drawable.icon_expense_departmentstore);
-        categoryImageMap.put("금융/보험", R.drawable.icon_expense_bank);
-        categoryImageMap.put("의료/건강", R.drawable.icon_expense_medi);
-        categoryImageMap.put("주거/통신", R.drawable.icon_expense_call);
-        categoryImageMap.put("학습/교육", R.drawable.icon_expense_edu);
-        categoryImageMap.put("교통/차량", R.drawable.icon_expense_traffic);
-        categoryImageMap.put("문화/예술/취미", R.drawable.icon_expense_play);
-        categoryImageMap.put("여행/숙박", R.drawable.icon_expense_traffic);
-        categoryImageMap.put("경조사/회비", R.drawable.icon_expense_cong);
-        categoryImageMap.put("기타", R.drawable.icon_expense_else);
+        categoryImageMap.put("주수입", R.drawable.icon_income_main);
+        categoryImageMap.put("부수입", R.drawable.icon_income_additional);
+        categoryImageMap.put("기타수입", R.drawable.icon_income_else);
     }
 
     // 뷰 홀더 클래스
@@ -157,23 +147,22 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         ImageView categoryImage;
         TextView date, category, description, amount;
 
-        public ViewHolder(@NonNull View itemView, final OnItemClickListener clickListener, final OnItemLongClickListener longClickListener) {  // 생성자에서 리스너 전달받음
+        public ViewHolder(@NonNull View itemView, final IncomeAdapter.OnItemClickListener clickListener, final IncomeAdapter.OnItemLongClickListener longClickListener) {  // 생성자에서 리스너 전달받음
             super(itemView);
 
             categoryImage = itemView.findViewById(R.id.categoryImage);
-
             description = itemView.findViewById(R.id.description);
             date = itemView.findViewById(R.id.date);
             category = itemView.findViewById(R.id.category);
             amount = itemView.findViewById(R.id.amount);
-//            isSmartExpense = itemView.findViewById(R.id.isSmartExpense);
+//            isSmartIncome = itemView.findViewById(R.id.isSmartIncome);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int position = getAdapterPosition();
                     if (clickListener != null && position != RecyclerView.NO_POSITION) {
-                        clickListener.onItemClick(ViewHolder.this, view, position);
+                        clickListener.onItemClick(IncomeAdapter.ViewHolder.this, view, position);
                     }
                 }
             });
@@ -183,7 +172,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
                 public boolean onLongClick(View view) {
                     int position = getAdapterPosition();
                     if (longClickListener != null && position != RecyclerView.NO_POSITION) {
-                        longClickListener.onItemLongClick(ViewHolder.this, view, position);
+                        longClickListener.onItemLongClick(IncomeAdapter.ViewHolder.this, view, position);
                         return true;  // 이벤트 소비
                     }
                     return false;

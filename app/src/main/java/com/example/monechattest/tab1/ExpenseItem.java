@@ -9,31 +9,30 @@ public class ExpenseItem implements Serializable {
     private String category, description, amount, note;
     private boolean isSmartExpense;
 
-    public ExpenseItem(int idx, Date date, String category, String description, String amount, boolean isSmartExpense) {
+    public ExpenseItem(int idx, Date date, String category, String description, String amount, String note, boolean isSmartExpense) {
         this.idx = idx;
         this.date = date;
         this.category = category;
         this.description = description;
         this.amount = amount;
+        this.note = note;
         this.isSmartExpense = isSmartExpense;
     }
 
-    public ExpenseItem(Date date, String category, String description, String amount, boolean isSmartExpense, String note) {
+    public ExpenseItem(String description, Date date, String category, String amount, String note) {
+        this.description = description;
         this.date = date;
         this.category = category;
-        this.description = description;
         this.amount = amount;
-        this.isSmartExpense = isSmartExpense;
         this.note = note;
     }
 
-    public ExpenseItem(int id, String description, Date date, String category, String amount, boolean isSmartExpense) {
-        this.idx = id;
-        this.description = description;
-        this.date = date;
-        this.category = category;
-        this.amount = amount;
-        this.isSmartExpense = isSmartExpense;
+    public long getDateMillis() {
+        return date != null ? date.getTime() : 0;
+    }
+
+    public void setDateMillis(long millis) {
+        this.date = new Date(millis);
     }
 
     public String getAmount() {
