@@ -1,20 +1,72 @@
 package com.example.monechattest.tab2;
 
-//채팅 메시지의 데이터를 보유할 모델 클래스 정의
 public class ChatMessage {
-    private String content;
-    private boolean isSentByMe;
+    private String message;
+    private boolean isSentByCurrentUser;
+    private String userName;
+    private String profileImage;
+    private String timestamp;
 
-    public ChatMessage(String content, boolean isSentByMe) {
-        this.content = content;
-        this.isSentByMe = isSentByMe;
+    // 기존 생성자
+    public ChatMessage(String message, boolean isSentByCurrentUser) {
+        this.message = message;
+        this.isSentByCurrentUser = isSentByCurrentUser;
     }
 
-    public String getContent() {
-        return content;
+    // 새 생성자
+    public ChatMessage(String message, boolean isSentByCurrentUser, String userName) {
+        this.message = message;
+        this.isSentByCurrentUser = isSentByCurrentUser;
+        this.userName = userName;
     }
 
-    public boolean isSentByMe() {
-        return isSentByMe;
+    // 새 생성자 (프로필 이미지와 시간 포함)
+    public ChatMessage(String message, boolean isSentByCurrentUser, String userName, String profileImage, String timestamp) {
+        this.message = message;
+        this.isSentByCurrentUser = isSentByCurrentUser;
+        this.userName = userName;
+        this.profileImage = profileImage;
+        this.timestamp = timestamp;
+    }
+
+    // Getter와 Setter 추가
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public boolean isSentByCurrentUser() {
+        return isSentByCurrentUser;
+    }
+
+    public void setSentByCurrentUser(boolean sentByCurrentUser) {
+        isSentByCurrentUser = sentByCurrentUser;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 }

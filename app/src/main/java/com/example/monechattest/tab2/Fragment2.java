@@ -27,7 +27,9 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -39,6 +41,7 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     private static final String JWT_TOKEN_KEY = "jwt_token";
     private static final String CHAT_ROOM_IDENTIFIER_KEY = "chat_room_identifier";
     private static final String CHAT_MESSAGES_KEY = "chat_messages";
+    private static final String USER_NAME_KEY = "user_name";
 
     private RecyclerView mRecyclerView;
     private ChatAdapter mAdapter;
@@ -51,6 +54,9 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     private String chatRoomIdentifier;
     private boolean isRoomJoined = false; // 채팅방 입장 여부를 추적
     private boolean isSocketInitialized = false; // 소켓 초기화 여부를 추적
+    private String userName; // 사용자 이름
+
+    private Set<String> sentMessages = new HashSet<>(); // 보낸 메시지 추적
 
     @Nullable
     @Override
@@ -85,10 +91,13 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             }
         });
 
+        // SharedPreferences에서 사용자 이름 로드
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        userName = sharedPreferences.getString(USER_NAME_KEY, "Unknown User");
+
         initializeSocket();
 
         // 이전에 저장된 채팅방 상태와 메시지 복원
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         chatRoomIdentifier = sharedPreferences.getString(CHAT_ROOM_IDENTIFIER_KEY, null);
         if (chatRoomIdentifier != null) {
             openChatRoom(chatRoomIdentifier);
@@ -180,9 +189,6 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(CHAT_ROOM_IDENTIFIER_KEY, chatRoomIdentifier);
             editor.apply();
-        } else {
-            // 앱 재시작 후에도 채팅방에 다시 가입
-            sendMessage("joinRoom", chatRoomIdentifier);
         }
     }
 
@@ -213,9 +219,6 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             isSocketInitialized = true; // 소켓이 초기화되었음을 표시
         } else {
             socket = socketManager.getSocket();
-            socket.on(Socket.EVENT_CONNECT, onConnect);
-            socket.on(Socket.EVENT_DISCONNECT, onDisconnect);
-            socket.on("chatMessage", onChatMessage);
         }
     }
 
@@ -229,10 +232,13 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             try {
                 data.put("event", event);
                 data.put("message", message);
+                data.put("userName", userName); // 사용자 이름 추가
                 Log.d(TAG, "Sending: " + data.toString());
                 socket.emit("message", data.toString()); // JSON 객체를 문자열로 변환하여 전송
+
                 if ("chatMessage".equals(event)) {
-                    ChatMessage chatMessage = new ChatMessage(message, true);
+                    sentMessages.add(message); // 보낸 메시지 저장
+                    ChatMessage chatMessage = new ChatMessage(message, true, userName); // 사용자 이름 추가
                     mMessageList.add(chatMessage);
                     mAdapter.notifyItemInserted(mMessageList.size() - 1);
                     mRecyclerView.scrollToPosition(mMessageList.size() - 1);
@@ -265,12 +271,7 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         }
     }
 
-    private final Emitter.Listener onConnect = args -> {
-        Log.d(TAG, "Connected");
-        if (chatRoomIdentifier != null && !isRoomJoined) {
-            sendMessage("joinRoom", chatRoomIdentifier);
-        }
-    };
+    private final Emitter.Listener onConnect = args -> Log.d(TAG, "Connected");
 
     private final Emitter.Listener onDisconnect = args -> Log.d(TAG, "Disconnected");
 
@@ -281,7 +282,17 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             requireActivity().runOnUiThread(() -> {
                 try {
                     String message = messageData.getString("message");
-                    ChatMessage chatMessage = new ChatMessage(message, false);
+                    String userName = messageData.getString("userName");
+                    String profileImage = messageData.getString("profile_image");
+                    String timestamp = messageData.getString("timestamp");
+
+                    // 보낸 메시지와 동일한 메시지가 서버에서 돌아온 경우 무시
+                    if (sentMessages.contains(message)) {
+                        sentMessages.remove(message);
+                        return;
+                    }
+
+                    ChatMessage chatMessage = new ChatMessage(message, false, userName, profileImage, timestamp);
                     mMessageList.add(chatMessage);
                     mAdapter.notifyItemInserted(mMessageList.size() - 1);
                     mRecyclerView.scrollToPosition(mMessageList.size() - 1);
@@ -296,7 +307,7 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     @Override
     public void onNewChatMessage(String message) {
         // 새로운 채팅 메시지를 처리
-        ChatMessage chatMessage = new ChatMessage(message, false);
+        ChatMessage chatMessage = new ChatMessage(message, false, userName);
         mMessageList.add(chatMessage);
         mAdapter.notifyItemInserted(mMessageList.size() - 1);
         mRecyclerView.scrollToPosition(mMessageList.size() - 1);
