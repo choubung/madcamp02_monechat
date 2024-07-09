@@ -35,7 +35,7 @@ public class GlobalApplication extends Application {
         // ChatReceiver 등록
         chatReceiver = new ChatReceiver();
         IntentFilter filter = new IntentFilter("NEW_CHAT_MESSAGE");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(chatReceiver, filter, Context.RECEIVER_EXPORTED);
         } else {
             registerReceiver(chatReceiver, filter);
