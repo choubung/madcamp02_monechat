@@ -49,6 +49,7 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     private RecyclerView mRecyclerView;
     private ChatAdapter mAdapter;
     private List<ChatMessage> mMessageList;
+    private List<ChatMessage> pendingMessages = new ArrayList<>(); // 임시 메시지 리스트 초기화
     private EditText mInputEditText;
     private Button mSendButton;
     private Button mNewChatButton; // 새로운 채팅방 생성 버튼
@@ -130,6 +131,18 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     public void onDestroy() {
         super.onDestroy();
         requireActivity().unregisterReceiver(chatReceiver);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        for (ChatMessage message : pendingMessages) {
+            mMessageList.add(message);
+            mAdapter.notifyItemInserted(mMessageList.size() - 1);
+            mRecyclerView.scrollToPosition(mMessageList.size() - 1);
+            saveChatMessages(); // 메시지 저장
+        }
+        pendingMessages.clear(); // 임시 메시지 리스트 초기화
     }
 
     // 채팅방 옵션 다이얼로그 표시
@@ -319,7 +332,22 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
 
             // 이 부분을 수정하여 프래그먼트가 연결된 경우에만 UI 작업을 수행하도록 합니다.
             if (!isAdded() || getActivity() == null) {
-                Log.d(TAG, "Fragment not attached to an activity");
+                Log.d(TAG, "Fragment not attached to an activity, adding to pendingMessages");
+                try {
+                    String message = messageData.getString("message");
+                    String userName = messageData.getString("username");
+                    String profileImage = messageData.getString("profile_image");
+                    String timestamp = messageData.getString("timestamp");
+
+                    ChatMessage chatMessage = new ChatMessage(message, false, userName, profileImage, timestamp);
+                    pendingMessages.add(chatMessage);
+                    Log.d(TAG, "Added to pendingMessages: " + message);
+                    if (pendingMessages.size() >0) {
+                        Log.d(TAG, "good: " + pendingMessages.get(pendingMessages.size()-1).getMessage());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 return;
             }
 
