@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -67,7 +69,16 @@ public class ExpenseDetailActivity extends AppCompatActivity {
             descriptionTextView.setText(description);
             dateTextView.setText(formattedDate);
             categoryTextView.setText(category);
-            amountTextView.setText(amount);
+            // 금액 포맷팅
+            try {
+                double amountValue = Double.parseDouble(amount);
+                String formattedAmount = NumberFormat.getNumberInstance(Locale.getDefault()).format(amountValue);
+                amountTextView.setText(formattedAmount);
+            } catch (NumberFormatException e) {
+                // 금액 파싱 오류가 발생할 경우 원래 문자열을 그대로 설정
+                amountTextView.setText(amount);
+            }
+
             noteTextView.setText(note);
             categoryImageView = findViewById(R.id.categoryImage); // ImageView 초기화
 

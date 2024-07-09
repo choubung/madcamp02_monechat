@@ -25,7 +25,9 @@ import com.example.monechattest.R;
 import com.example.monechattest.database.CategoryExpense;
 import com.example.monechattest.database.ExpenseViewModel;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +37,7 @@ public class ExpensePieChartFragment extends Fragment {
     private AnyChartView anyChartView;
     private Spinner spinner;
     private TextView noDataText;
+    private TextView top5Text;
     private String[] monthList = {"2024년 1월", "2024년 2월", "2024년 3월", "2024년 4월", "2024년 5월", "2024년 6월", "2024년 7월", "2024년 8월", "2024년 9월", "2024년 10월", "2024년 11월", "2024년 12월"};
 
     public ExpensePieChartFragment() {
@@ -49,6 +52,7 @@ public class ExpensePieChartFragment extends Fragment {
         anyChartView = view.findViewById(R.id.any_chart_view);
         anyChartView.setProgressBar(view.findViewById(R.id.progress_bar));
         noDataText = view.findViewById(R.id.no_data_text);
+        top5Text = view.findViewById(R.id.top5_text);
 
         spinner = view.findViewById(R.id.spinnerMonth);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, monthList);
@@ -72,6 +76,7 @@ public class ExpensePieChartFragment extends Fragment {
                         noDataText.setVisibility(View.GONE);
                     }
                     setupPieChart(categoryExpenses);
+                    displayTop5(categoryExpenses);
                     anyChartView.setVisibility(View.VISIBLE);
                 });
             }
@@ -108,6 +113,35 @@ public class ExpensePieChartFragment extends Fragment {
                 .itemsLayout(LegendLayout.HORIZONTAL)
                 .align(Align.CENTER);
 
+        // 툴팁 비활성화
+        pie.tooltip().enabled(false);
+
         anyChartView.setChart(pie);
+    }
+
+    private void displayTop5(List<CategoryExpense> categoryExpenses) {
+        // 총 금액 계산
+        double totalAmount = 0;
+        for (CategoryExpense categoryExpense : categoryExpenses) {
+            totalAmount += categoryExpense.getTotal();
+        }
+
+        // 금액 순으로 내림차순 정렬
+        Collections.sort(categoryExpenses, (o1, o2) -> Double.compare(o2.getTotal(), o1.getTotal()));
+
+        // 상위 5개 추출
+        List<CategoryExpense> top5Expenses = categoryExpenses.size() > 5 ? categoryExpenses.subList(0, 5) : categoryExpenses;
+
+        // 상위 5개 표시
+        StringBuilder top5TextBuilder = new StringBuilder();
+        NumberFormat numberFormat = NumberFormat.getInstance();
+        for (int i = 0; i < top5Expenses.size(); i++) {
+            CategoryExpense expense = top5Expenses.get(i);
+            double percentage = (expense.getTotal() / totalAmount) * 100;
+            top5TextBuilder.append(String.format(Locale.getDefault(), "%d. %s : %s (%.2f%%)\n",
+                    i + 1, expense.getCategory(), numberFormat.format(expense.getTotal()), percentage));
+        }
+
+        top5Text.setText(top5TextBuilder.toString());
     }
 }
