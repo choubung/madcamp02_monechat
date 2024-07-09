@@ -279,6 +279,8 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         if (args[0] != null) {
             JSONObject messageData = (JSONObject) args[0];
             Log.d(TAG, "New message: " + messageData);
+            if (!isAdded()) return; // Fragment가 Activity에 첨부되었는지 확인
+
             requireActivity().runOnUiThread(() -> {
                 try {
                     String message = messageData.getString("message");
