@@ -45,4 +45,7 @@ public interface ExpenseDao {
     // 카테고리별 소비 금액 합계를 가져오는 메서드 추가
     @Query("SELECT category, SUM(CAST(amount AS REAL)) AS total FROM expense GROUP BY category")
     List<CategoryExpense> getCategoryExpenses(); // gpt코드
+
+    @Query("SELECT category, SUM(CAST(amount AS REAL)) AS total FROM expense WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch', 'localtime')) = :yearMonth GROUP BY category")
+    List<CategoryExpense> getCategoryExpensesByMonth(String yearMonth);
 }
