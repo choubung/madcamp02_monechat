@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHolder> {
@@ -25,6 +26,16 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
     ArrayList<ExpenseItem> expenseItems;
     OnItemClickListener clickListener;
     OnItemLongClickListener longClickListener;  // 길게 누르기 리스너 추가
+
+    // 이미지 리소스 매핑
+    private HashMap<String, Integer> categoryImageMap = new HashMap<>();
+
+    public ExpenseAdapter(Context context, ArrayList<ExpenseItem> expenseItems) {
+        this.context = context;
+        this.expenseItems = expenseItems;
+        sortItemsByDate();  // 초기 데이터 정렬
+        initializeCategoryImageMap(); // 이미지 매핑 초기화
+    }
 
     public ExpenseItem getItem(int position) {
         return expenseItems.get(position);
@@ -52,12 +63,6 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         void onItemLongClick(ViewHolder holder, View view, int position);
     }
 
-    public ExpenseAdapter(Context context, ArrayList<ExpenseItem> expenseItems) {
-        this.context = context;
-        this.expenseItems = expenseItems;
-        sortItemsByDate();  // 초기 데이터 정렬
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -71,7 +76,6 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         ExpenseItem item = expenseItems.get(position);
 
         long dateMillis = item.getDateMillis();
-
         Date date = new Date(dateMillis);
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd", Locale.getDefault());
         String formattedDate = sdf.format(date);
@@ -88,6 +92,14 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         } catch (NumberFormatException e) {
             // 금액 파싱 오류가 발생할 경우 원래 문자열을 그대로 설정
             holder.amount.setText(item.getAmount().toString());
+        }
+
+        // 카테고리에 따라 이미지 설정
+        Integer imageResId = categoryImageMap.get(item.getCategory());
+        if (imageResId != null) {
+            holder.categoryImage.setImageResource(imageResId);
+        } else {
+            holder.categoryImage.setImageResource(R.drawable.ic_launcher_foreground); // 기본 이미지
         }
     }
 
@@ -122,11 +134,28 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         });
     }
 
+    // 카테고리와 이미지 리소스 ID를 매핑하는 메서드
+    private void initializeCategoryImageMap() {
+        categoryImageMap.put("식사", R.drawable.icon_expense_meal);
+        categoryImageMap.put("카페/간식", R.drawable.icon_expense_cafe);
+        categoryImageMap.put("생활/마트", R.drawable.icon_expense_market);
+        categoryImageMap.put("온라인쇼핑", R.drawable.icon_expense_online);
+        categoryImageMap.put("백화점", R.drawable.icon_expense_departmentstore);
+        categoryImageMap.put("금융/보험", R.drawable.icon_expense_bank);
+        categoryImageMap.put("의료/건강", R.drawable.icon_expense_medi);
+        categoryImageMap.put("주거/통신", R.drawable.icon_expense_call);
+        categoryImageMap.put("학습/교육", R.drawable.icon_expense_edu);
+        categoryImageMap.put("교통/차량", R.drawable.icon_expense_traffic);
+        categoryImageMap.put("문화/예술/취미", R.drawable.icon_expense_play);
+        categoryImageMap.put("여행/숙박", R.drawable.icon_expense_traffic);
+        categoryImageMap.put("경조사/회비", R.drawable.icon_expense_cong);
+        categoryImageMap.put("기타", R.drawable.icon_expense_else);
+    }
+
     // 뷰 홀더 클래스
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView categoryImage;
         TextView date, category, description, amount;
-        Button isSmartExpense; // TODO: 현명 소비 화면에 어떤 방식으로 띄울 건지 구체적으로 정해야함 (drawable)
 
         public ViewHolder(@NonNull View itemView, final OnItemClickListener clickListener, final OnItemLongClickListener longClickListener) {  // 생성자에서 리스너 전달받음
             super(itemView);
@@ -136,7 +165,6 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
             description = itemView.findViewById(R.id.description);
             date = itemView.findViewById(R.id.date);
             category = itemView.findViewById(R.id.category);
-
             amount = itemView.findViewById(R.id.amount);
 //            isSmartExpense = itemView.findViewById(R.id.isSmartExpense);
 

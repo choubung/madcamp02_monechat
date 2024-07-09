@@ -53,6 +53,7 @@
                 android:layout_marginBottom="15dp">
 
                 <ImageView
+                    android:id="@+id/categoryImage"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:padding="5dp"
