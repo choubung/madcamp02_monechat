@@ -1,10 +1,7 @@
 package com.example.monechattest.tab2;
 
-import android.content.BroadcastReceiver;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.monechattest.R;
 import com.example.monechattest.ChatMessageListener;
-import com.example.monechattest.ChatReceiver;
 import com.example.monechattest.SocketManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -54,8 +50,6 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     private Button mSendButton;
     private Button mNewChatButton; // 새로운 채팅방 생성 버튼
 
-    private ChatReceiver chatReceiver; // 메시지 수신기
-
     private Socket socket;
     private String chatRoomIdentifier;
     private boolean isRoomJoined = false; // 채팅방 입장 여부를 추적
@@ -78,11 +72,6 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         mAdapter = new ChatAdapter(mMessageList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
-
-        // BroadcastReceiver 등록
-        chatReceiver = new ChatReceiver();
-        IntentFilter filter = new IntentFilter("NEW_CHAT_MESSAGE");
-        requireContext().registerReceiver(chatReceiver, filter);
 
         mNewChatButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -347,7 +336,5 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     public void onDestroyView() {
         super.onDestroyView();
         // 소켓 연결을 유지하기 위해 이 부분에서 소켓 연결을 종료하지 않음
-
-        requireContext().unregisterReceiver(chatReceiver);
     }
 }
