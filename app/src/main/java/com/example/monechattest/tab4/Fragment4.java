@@ -20,7 +20,7 @@ import com.example.monechattest.R;
 
 import com.example.monechattest.R;
 
-public class Fragment4 extends Fragment implements ChatMessageListener {
+public class Fragment4 extends Fragment {
     private TextView messageTextView;
 
     @Override
@@ -28,10 +28,5 @@ public class Fragment4 extends Fragment implements ChatMessageListener {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_4, container, false);
 
         return rootView;
-    }
-
-    @Override
-    public void onNewChatMessage(String message) {
-        // 시스템 알림을 통해 메시지를 수신하므로 여기는 비워둡니다.
     }
 }

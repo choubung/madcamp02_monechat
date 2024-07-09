@@ -12,6 +12,11 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import android.content.pm.PackageManager;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentActivity;
+
+import com.example.monechattest.tab2.Fragment2;
+
 
 import android.os.Build;
 
@@ -43,13 +48,12 @@ public class ChatReceiver extends BroadcastReceiver {
                 Log.w(TAG, "Notification permission not granted");
             }
 
-            // 메시지를 각 탭으로 전달
-            if (context instanceof MainActivity) {
-                MainActivity mainActivity = (MainActivity) context;
-                for (Fragment fragment : mainActivity.getSupportFragmentManager().getFragments()) {
-                    if (fragment instanceof ChatMessageListener) {
-                        ((ChatMessageListener) fragment).onNewChatMessage(message);
-                    }
+            // 메시지를 Fragment2로 전달
+            if (context instanceof FragmentActivity) {
+                FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                Fragment fragment = fragmentManager.findFragmentById(R.id.main_layout);
+                if (fragment instanceof Fragment2) {
+                    ((Fragment2) fragment).onNewChatMessage(message);
                 }
             }
 

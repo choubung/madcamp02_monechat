@@ -2,6 +2,7 @@ package com.example.monechattest.tab2;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.monechattest.R;
 import com.example.monechattest.ChatMessageListener;
+import com.example.monechattest.ChatReceiver;
 import com.example.monechattest.SocketManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -57,6 +59,22 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     private String userName; // 사용자 이름
 
     private Set<String> sentMessages = new HashSet<>(); // 보낸 메시지 추적
+    private ChatReceiver chatReceiver;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // SharedPreferences에서 사용자 이름 로드
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        userName = sharedPreferences.getString(USER_NAME_KEY, "Unknown User");
+
+        initializeSocket();
+
+        // BroadcastReceiver 등록
+        chatReceiver = new ChatReceiver();
+        IntentFilter filter = new IntentFilter("NEW_CHAT_MESSAGE");
+        requireActivity().registerReceiver(chatReceiver, filter);
+    }
 
     @Nullable
     @Override
@@ -91,13 +109,8 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             }
         });
 
-        // SharedPreferences에서 사용자 이름 로드
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
-        userName = sharedPreferences.getString(USER_NAME_KEY, "Unknown User");
-
-        initializeSocket();
-
         // 이전에 저장된 채팅방 상태와 메시지 복원
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         chatRoomIdentifier = sharedPreferences.getString(CHAT_ROOM_IDENTIFIER_KEY, null);
         if (chatRoomIdentifier != null) {
             openChatRoom(chatRoomIdentifier);
@@ -106,6 +119,12 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         loadChatMessages();
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        requireActivity().unregisterReceiver(chatReceiver);
     }
 
     // 채팅방 옵션 다이얼로그 표시
@@ -220,7 +239,9 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             isSocketInitialized = true; // 소켓이 초기화되었음을 표시
         } else {
             socket = socketManager.getSocket();
-            socket.on("chatMessage", onChatMessage); // 이벤트 리스너 설정
+            if (!isRoomJoined) {
+                socket.on("chatMessage", onChatMessage); // 이벤트 리스너 설정
+            }
         }
     }
 
