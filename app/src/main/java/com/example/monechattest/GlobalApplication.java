@@ -2,8 +2,11 @@ package com.example.monechattest;
 
 import android.app.Application;
 import com.kakao.sdk.common.KakaoSdk; // Kakao SDK 라이브러리 import 경로는 실제 사용 환경에 따라 다를 수 있습니다
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.util.Log;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -32,7 +35,11 @@ public class GlobalApplication extends Application {
         // ChatReceiver 등록
         chatReceiver = new ChatReceiver();
         IntentFilter filter = new IntentFilter("NEW_CHAT_MESSAGE");
-        registerReceiver(chatReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(chatReceiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(chatReceiver, filter);
+        }
     }
 
     private Emitter.Listener onChatMessage = new Emitter.Listener() {
