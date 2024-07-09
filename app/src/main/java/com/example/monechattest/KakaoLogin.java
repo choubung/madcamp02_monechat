@@ -51,7 +51,6 @@ public class KakaoLogin extends AppCompatActivity {
         }
 
         Button kakaoLoginButton = findViewById(R.id.kakao_login_button);
-        Button guestLoginButton = findViewById(R.id.guest_login_button);
 
         kakaoLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,14 +68,6 @@ public class KakaoLogin extends AppCompatActivity {
                     }
                     return null;
                 });
-            }
-        });
-
-        guestLoginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("GuestLogin", "게스트 로그인 선택");
-                moveToMainActivity();
             }
         });
     }

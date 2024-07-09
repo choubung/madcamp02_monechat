@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="275dp"
+        android:src="@drawable/monechat_text"
+        android:layout_marginVertical="110dp"/>
 
     <Button
         android:id="@+id/kakao_login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="카카오 로그인" />
+        android:layout_width="300dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/kakao_login_large_wide"
+        app:backgroundTint="@null"/>
 
-    <Button
-        android:id="@+id/guest_login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="게스트 로그인"
-        android:layout_below="@id/kakao_login_button"
-        android:layout_marginTop="16dp" />
-
-</RelativeLayout>
+</LinearLayout>
