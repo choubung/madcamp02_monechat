@@ -37,6 +37,7 @@ public class SocketManager {
     }
 
     private void initializeSocket(Map<String, String> auth) {
+
         try {
             IO.Options options = IO.Options.builder().build();
             if (auth != null) {

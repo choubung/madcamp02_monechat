@@ -213,12 +213,14 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
 
             socket.on(Socket.EVENT_CONNECT, onConnect);
             socket.on(Socket.EVENT_DISCONNECT, onDisconnect);
-            socket.on("chatMessage", onChatMessage);
+            socket.on("chatMessage", onChatMessage); // 이벤트 리스너 설정
             socket.connect();
+            Log.d(TAG, "Socket connected and listener set up"); // 소켓 연결 로그 추가
 
             isSocketInitialized = true; // 소켓이 초기화되었음을 표시
         } else {
             socket = socketManager.getSocket();
+            socket.on("chatMessage", onChatMessage); // 이벤트 리스너 설정
         }
     }
 
@@ -237,7 +239,9 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
                 socket.emit("message", data.toString()); // JSON 객체를 문자열로 변환하여 전송
 
                 if ("chatMessage".equals(event)) {
-                    sentMessages.add(message); // 보낸 메시지 저장
+                    if (!event.equals("joinRoom")) {
+                        sentMessages.add(message); // 보낸 메시지 저장
+                    }
                     ChatMessage chatMessage = new ChatMessage(message, true, userName); // 사용자 이름 추가
                     mMessageList.add(chatMessage);
                     mAdapter.notifyItemInserted(mMessageList.size() - 1);
@@ -271,20 +275,32 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         }
     }
 
-    private final Emitter.Listener onConnect = args -> Log.d(TAG, "Connected");
+    private final Emitter.Listener onConnect = args -> {
+        Log.d(TAG, "Connected");
+        if (chatRoomIdentifier != null && !isRoomJoined) {
+            sendMessage("joinRoom", chatRoomIdentifier);
+            isRoomJoined = true;
+        }
+    };
 
     private final Emitter.Listener onDisconnect = args -> Log.d(TAG, "Disconnected");
 
     private final Emitter.Listener onChatMessage = args -> {
+        Log.d(TAG, "onChatMessage event triggered");
         if (args[0] != null) {
             JSONObject messageData = (JSONObject) args[0];
             Log.d(TAG, "New message: " + messageData);
-            if (!isAdded()) return; // Fragment가 Activity에 첨부되었는지 확인
 
-            requireActivity().runOnUiThread(() -> {
+            // 이 부분을 수정하여 프래그먼트가 연결된 경우에만 UI 작업을 수행하도록 합니다.
+            if (!isAdded() || getActivity() == null) {
+                Log.d(TAG, "Fragment not attached to an activity");
+                return;
+            }
+
+            getActivity().runOnUiThread(() -> {
                 try {
                     String message = messageData.getString("message");
-                    String userName = messageData.getString("userName");
+                    String userName = messageData.getString("username");
                     String profileImage = messageData.getString("profile_image");
                     String timestamp = messageData.getString("timestamp");
 
