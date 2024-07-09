@@ -180,6 +180,9 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(CHAT_ROOM_IDENTIFIER_KEY, chatRoomIdentifier);
             editor.apply();
+        } else {
+            // 앱 재시작 후에도 채팅방에 다시 가입
+            sendMessage("joinRoom", chatRoomIdentifier);
         }
     }
 
@@ -210,6 +213,9 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
             isSocketInitialized = true; // 소켓이 초기화되었음을 표시
         } else {
             socket = socketManager.getSocket();
+            socket.on(Socket.EVENT_CONNECT, onConnect);
+            socket.on(Socket.EVENT_DISCONNECT, onDisconnect);
+            socket.on("chatMessage", onChatMessage);
         }
     }
 
@@ -259,7 +265,12 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         }
     }
 
-    private final Emitter.Listener onConnect = args -> Log.d(TAG, "Connected");
+    private final Emitter.Listener onConnect = args -> {
+        Log.d(TAG, "Connected");
+        if (chatRoomIdentifier != null && !isRoomJoined) {
+            sendMessage("joinRoom", chatRoomIdentifier);
+        }
+    };
 
     private final Emitter.Listener onDisconnect = args -> Log.d(TAG, "Disconnected");
 
