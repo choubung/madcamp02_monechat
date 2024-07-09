@@ -109,7 +109,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         .load(message.getProfileImage())
                         .into(profileImageView);
             } else {
-                profileImageView.setImageResource(R.drawable.icon_backspace); // 기본 프로필 이미지 설정
+                profileImageView.setImageResource(R.drawable.icon_my_page); // 기본 프로필 이미지 설정
             }
         }
     }
