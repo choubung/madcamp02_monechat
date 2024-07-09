@@ -8,7 +8,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,8 +18,6 @@ import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.chart.common.listener.Event;
-import com.anychart.chart.common.listener.ListenersInterface;
 import com.anychart.charts.Pie;
 import com.anychart.enums.Align;
 import com.anychart.enums.LegendLayout;
@@ -66,15 +63,16 @@ public class ExpensePieChartFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 String selectedMonth = String.format(Locale.getDefault(), "2024-%02d", i + 1);
                 expenseViewModel.getCategoryExpenses(selectedMonth).observe(getViewLifecycleOwner(), categoryExpenses -> {
-                    if (categoryExpenses != null && !categoryExpenses.isEmpty()) {
-                        noDataText.setVisibility(View.GONE);
-                        anyChartView.setVisibility(View.VISIBLE);
-                        setupPieChart(categoryExpenses);
-                    } else {
-                        anyChartView.clear();
+                    if (categoryExpenses == null || categoryExpenses.isEmpty()) {
+                        // 더미 데이터 추가
+                        categoryExpenses = new ArrayList<>();
+                        categoryExpenses.add(new CategoryExpense("No Data", 0));
                         noDataText.setVisibility(View.VISIBLE);
-                        anyChartView.setVisibility(View.GONE);
+                    } else {
+                        noDataText.setVisibility(View.GONE);
                     }
+                    setupPieChart(categoryExpenses);
+                    anyChartView.setVisibility(View.VISIBLE);
                 });
             }
 
@@ -109,12 +107,6 @@ public class ExpensePieChartFragment extends Fragment {
                 .position("center-bottom")
                 .itemsLayout(LegendLayout.HORIZONTAL)
                 .align(Align.CENTER);
-
-        pie.setOnClickListener(new ListenersInterface.OnClickListener(new String[]{"x", "value"}) {
-            @Override
-            public void onClick(Event event) {
-            }
-        });
 
         anyChartView.setChart(pie);
     }
