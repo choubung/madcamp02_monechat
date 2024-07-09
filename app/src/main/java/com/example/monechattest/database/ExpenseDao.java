@@ -41,4 +41,8 @@ public interface ExpenseDao {
 
     @Query("SELECT SUM(CAST(amount AS REAL)) FROM expense WHERE strftime('%Y-%m', datetime(date / 1000, 'unixepoch')) = :yearMonth")
     LiveData<Double> getTotalForMonthLiveData(String yearMonth);
+
+    // 카테고리별 소비 금액 합계를 가져오는 메서드 추가
+    @Query("SELECT category, SUM(CAST(amount AS REAL)) AS total FROM expense GROUP BY category")
+    List<CategoryExpense> getCategoryExpenses(); // gpt코드
 }
