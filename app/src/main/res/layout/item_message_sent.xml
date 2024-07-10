@@ -14,5 +14,5 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bubble_sent"
         android:padding="10dp"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/black"/>
 </LinearLayout>
