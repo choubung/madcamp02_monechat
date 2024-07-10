@@ -19,7 +19,6 @@ public class ExpenseEntity {
     public boolean isSmartExpense; // 현명소비
     public String note; // 메모
 
-
     // 생성자 - 현명 소비 여부는 리사이클러 뷰에서 결정하므로 여기서는 설정하지 않음
     public ExpenseEntity(String description, Date date, String category, String amount, String note) {
         this.description = description;

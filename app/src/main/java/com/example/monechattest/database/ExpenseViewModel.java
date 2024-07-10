@@ -15,6 +15,20 @@ import java.util.concurrent.Executors;
 public class ExpenseViewModel extends AndroidViewModel {
     private final ExpenseDao expenseDao;
     private final ExecutorService executorService;
+    private final MutableLiveData<ExpenseEntity> newExpense = new MutableLiveData<>();
+
+    // gpt 0710-15
+    public void addExpense(ExpenseEntity expense) {
+        executorService.execute(() -> {
+            expenseDao.insert(expense);
+            newExpense.postValue(expense);
+        });
+        newExpense.setValue(expense);
+    }
+
+    public LiveData<ExpenseEntity> getNewExpense() {
+        return newExpense;
+    }
 
     public ExpenseViewModel(@NonNull Application application) {
         super(application);

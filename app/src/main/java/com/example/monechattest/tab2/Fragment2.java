@@ -15,6 +15,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +23,9 @@ import com.example.monechattest.R;
 import com.example.monechattest.ChatMessageListener;
 import com.example.monechattest.ChatReceiver;
 import com.example.monechattest.SocketManager;
+import com.example.monechattest.database.ExpenseViewModel;
+import com.example.monechattest.database.SharedViewModel;
+import com.example.monechattest.tab1.ExpenseItem;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -63,6 +67,9 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     private Set<String> sentMessages = new HashSet<>(); // 보낸 메시지 추적
     private ChatReceiver chatReceiver;
 
+    //private ExpenseViewModel expenseViewModel;
+    private SharedViewModel sharedViewModel;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +98,24 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         mInputEditText = rootView.findViewById(R.id.input);
         mSendButton = rootView.findViewById(R.id.sendButton);
         mNewChatButton = rootView.findViewById(R.id.newChatButton); // 새로운 채팅방 생성 버튼
+
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+
+        sharedViewModel.getNewExpense().observe(getViewLifecycleOwner(), newExpense -> {
+            if (newExpense != null) {
+                // 새로운 지출 내역이 추가되었을 때의 동작
+                sendMessage(newExpense.getDescription() + " " + newExpense.getAmount());
+            }
+        });
+
+        // 전달된 데이터 아이템 처리
+        if (getArguments() != null) {
+            ExpenseItem expenseItem = (ExpenseItem) getArguments().getSerializable("expenseItem");
+            if (expenseItem != null) {
+                String combinedText = expenseItem.getDescription() + " " + expenseItem.getAmount();
+                mInputEditText.setText(combinedText);
+            }
+        }
 
         mMessageList = new ArrayList<>();
         mAdapter = new ChatAdapter(mMessageList);
@@ -123,6 +148,16 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         }
 
         loadChatMessages();
+
+        // Initialize the ExpenseViewModel
+        //expenseViewModel = new ViewModelProvider(requireActivity()).get(ExpenseViewModel.class);
+
+        // Observe new expenses
+        //expenseViewModel.getNewExpense().observe(getViewLifecycleOwner(), newExpense -> {
+        //    if (newExpense != null) {
+        //        sendMessage("" + newExpense.getDescription() + " " + newExpense.getAmount());
+        //    }
+        //});
 
         return rootView;
     }
