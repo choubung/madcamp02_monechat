@@ -69,8 +69,10 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
 
     Intent serviceIntent;
 
-    //private ExpenseViewModel expenseViewModel;
+    // private ExpenseViewModel expenseViewModel;
     private SharedViewModel sharedViewModel;
+
+    private boolean expenseSent = false;  // 지출 내역 전송 여부 추적
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,6 +91,9 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         } else {
             requireActivity().registerReceiver(chatReceiver, filter);
         }
+
+        // 여기에 추가합니다.
+        expenseSent = false;  // 지출 내역 전송 여부 초기화
     }
 
     @Nullable
@@ -104,11 +109,26 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         sharedViewModel.getNewExpense().observe(getViewLifecycleOwner(), newExpense -> {
-            if (newExpense != null) {
-                // 새로운 지출 내역이 추가되었을 때의 동작
-                sendMessage(newExpense.getDescription() + " " + newExpense.getAmount());
+            if (newExpense != null && !expenseSent) {
+                expenseSent = true;  // 전송 여부 설정
+                // EditText에 데이터 설정
+                mInputEditText.setText(newExpense.getDescription() + " " + newExpense.getAmount());
+                // 상태 초기화
+                sharedViewModel.setNewExpense(null);
             }
         });
+
+        if (getArguments() != null) {
+            ExpenseItem expenseItem = (ExpenseItem) getArguments().getSerializable("expenseItem");
+            if (expenseItem != null) {
+                String combinedText = expenseItem.getDescription() + " " + expenseItem.getAmount();
+                mInputEditText.setText(combinedText);
+            } else {
+                mInputEditText.setText("");  // EditText 초기화
+            }
+        } else {
+            mInputEditText.setText("");  // EditText 초기화
+        }
 
         // 전달된 데이터 아이템 처리
         if (getArguments() != null) {
