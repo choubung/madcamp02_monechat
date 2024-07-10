@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".tab4.Fragment4">
 
@@ -13,14 +12,6 @@
         android:orientation="vertical"
         android:background="#FFB5A0"
         android:padding="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="마이페이지"
-            android:layout_marginBottom="20dp"
-            android:textSize="25sp"
-            android:textStyle="bold"/>
 
         <ImageView
             android:id="@+id/user_profile"
@@ -35,16 +26,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="홍길동"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:textSize="20sp"/>
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="17sp"/>
 
         <TextView
             android:id="@+id/user_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:textSize="18dp"
+            android:textSize="15dp"
             android:text="example@mail.com"/>
 
     </LinearLayout>
