@@ -76,7 +76,7 @@ public class Fragment4 extends Fragment {
         deleteAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showInputDialog("고객님의 소중한 개인정보를 지키기 위해 고객센터에서 회원님의 회원탈퇴를 처리해 드리고 있습니다. 탈퇴를 위해서는 고객센터로 문의 주시기 바랍니다.");
+                showInputDialog("탈퇴는 고객센터로 문의해 주세요.");
             }
         });
 
