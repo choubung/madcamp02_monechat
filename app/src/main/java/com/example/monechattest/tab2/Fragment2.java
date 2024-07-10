@@ -342,9 +342,6 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
                     ChatMessage chatMessage = new ChatMessage(message, false, userName, profileImage, timestamp);
                     pendingMessages.add(chatMessage);
                     Log.d(TAG, "Added to pendingMessages: " + message);
-                    if (pendingMessages.size() >0) {
-                        Log.d(TAG, "good: " + pendingMessages.get(pendingMessages.size()-1).getMessage());
-                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

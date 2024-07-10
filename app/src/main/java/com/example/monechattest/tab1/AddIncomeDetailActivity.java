@@ -12,12 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.monechattest.R;
 
@@ -95,37 +92,58 @@ public class AddIncomeDetailActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /* 기존 코드
-                Intent intent = new Intent();
-                // 저장 구현(putExtra) 요망
-                setResult(RESULT_OK, intent);
-                finish();*/
-
-                // 저장 처리 메서드 호출
-                saveIncome(); // gpt코드
+                if (areAllFieldsFilled()) {
+                    saveIncome();
+                } else {
+                    Toast.makeText(AddIncomeDetailActivity.this, "모든 내역을 입력하세요", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
+        // 각 EditText에 TextWatcher 추가
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                saveBtn.setEnabled(areAllFieldsFilled());
+            }
+        };
+
+        descriptionText.addTextChangedListener(textWatcher);
+        amountText.addTextChangedListener(textWatcher);
+        dateText.addTextChangedListener(textWatcher);
+
+        saveBtn.setEnabled(areAllFieldsFilled());
     }
 
-    // 카테고리 이미지 업데이트 메서드
-    private void updateCategoryImage(String category) {
-        Integer imageResId = categoryImageMap.get(category);
-        if (imageResId != null) {
-            categoryImage.setImageResource(imageResId);
-        } else {
-            categoryImage.setImageResource(R.drawable.ic_launcher_foreground); // 기본 이미지
-        }
+    // 모든 필드가 채워졌는지 확인하는 메서드 추가 (메모 필드는 제외)
+    private boolean areAllFieldsFilled() {
+        return !descriptionText.getText().toString().isEmpty() &&
+                !amountText.getText().toString().isEmpty() &&
+                !dateText.getText().toString().isEmpty();
     }
 
-    // 카테고리와 이미지 리소스를 매핑하는 메서드
     private void initializeCategoryImageMap() {
         categoryImageMap.put("주수입", R.drawable.icon_income_main);
         categoryImageMap.put("부수입", R.drawable.icon_income_additional);
         categoryImageMap.put("기타수입", R.drawable.icon_income_else);
     }
 
-    // 금액 입력 시 포맷을 지정하는 메서드
-    private void setupAmountFormatting() { // 문제 없을듯
+    private void updateCategoryImage(String category) {
+        Integer imageResId = categoryImageMap.get(category);
+        if (imageResId != null) {
+            categoryImage.setImageResource(imageResId);
+        } else {
+            categoryImage.setImageResource(R.drawable.ic_launcher_foreground);
+        }
+    }
+
+    private void setupAmountFormatting() {
         amountText.addTextChangedListener(new TextWatcher() {
             private String current = "";
 
@@ -155,7 +173,6 @@ public class AddIncomeDetailActivity extends AppCompatActivity {
         });
     }
 
-    // 날짜 선택기 설정 메서드
     private void setupDatePicker() {
         dateText.setOnClickListener(v -> {
             final Calendar calendar = Calendar.getInstance();
@@ -172,25 +189,22 @@ public class AddIncomeDetailActivity extends AppCompatActivity {
         });
     }
 
-    // 지출 정보를 저장하는 메서드
     private void saveIncome() {
         String description = descriptionText.getText().toString();
-        String amount = amountText.getText().toString().replace(",","");
+        String amount = amountText.getText().toString().replace(",", "");
         String dateStr = dateText.getText().toString();
         String memo = memoText.getText().toString();
         String category = spinner.getSelectedItem().toString();
 
-        Date date = null; // 데이터 컨버터
+        Date date = null;
         try {
             date = dateFormat.parse(dateStr);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        //IncomeItem 객체 생성
         IncomeItem incomeItem = new IncomeItem(0, date, category, description, amount, memo);
 
-        // Intent에 데이터 추가하여 반환
         Intent intent = new Intent();
         intent.putExtra("incomeItem", incomeItem);
         setResult(RESULT_OK, intent);

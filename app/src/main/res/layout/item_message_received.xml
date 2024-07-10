@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,18 +12,21 @@
         android:orientation="horizontal"
         android:gravity="start">
 
-        <ImageView
+        <!-- CircleImageView 사용 -->
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/image_profile_picture"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="4dp"
+            android:padding="2dp"
             android:src="@drawable/icon_backspace"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-`
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
+
             <TextView
                 android:id="@+id/text_message_name"
                 android:layout_width="wrap_content"
@@ -49,5 +52,6 @@
         android:background="@drawable/bubble_received"
         android:padding="10dp"
         android:textColor="@android:color/black"
+        android:layout_marginTop="3dp"
         android:text="Hello, this is a sample message!"/>
 </LinearLayout>
