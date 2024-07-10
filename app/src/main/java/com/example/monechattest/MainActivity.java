@@ -10,6 +10,7 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.IntentFilter;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -25,7 +26,8 @@ import com.example.monechattest.tab4.Fragment4;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String CHANNEL_ID = "chat_messages";
-    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1001;
+    private static final int REQUEST_CODE_POST_NOTIFICATIONS = 1001; // 권한 요청 코드 추가
+
     // 바텀 네비게이션
     BottomNavigationView bottomNavigationView; // 하단 탭 뷰
     // 프래그먼트 변수
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.main_layout, fragment1).commitAllowingStateLoss();
 
         // 리스너 등록
-        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if (item.getItemId() == R.id.list_menu) { // switch로 했더니 오류 발생하여 if문으로 변경
@@ -76,38 +78,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Notification Channel 생성
-        createNotificationChannel();
-
-        // Android 13 이상에서 알림 권한 요청
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
-            }
-        }
+        // 권한 요청 처리
+        GlobalApplication globalApp = (GlobalApplication) getApplicationContext();
+        globalApp.checkAndRequestNotificationPermission(this);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE_POST_NOTIFICATIONS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "Notification permission granted");
             } else {
                 Log.d(TAG, "Notification permission denied");
             }
-        }
-    }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Chat Messages";
-            String description = "Channel for chat message notifications";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
         }
     }
 }

@@ -1,5 +1,5 @@
 package com.example.monechattest;
 
 public interface ChatMessageListener {
-    void onNewChatMessage(String message);
+    void onNewChatMessage(Object args);
 }

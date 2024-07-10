@@ -2,6 +2,7 @@ package com.example.monechattest.tab2;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -17,7 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.monechattest.GlobalApplication;
 import com.example.monechattest.R;
 import com.example.monechattest.ChatMessageListener;
 import com.example.monechattest.ChatReceiver;
@@ -61,7 +62,8 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     private String userName; // 사용자 이름
 
     private Set<String> sentMessages = new HashSet<>(); // 보낸 메시지 추적
-    private ChatReceiver chatReceiver;
+
+    Intent serviceIntent;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +75,7 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         initializeSocket();
 
         // BroadcastReceiver 등록
-        chatReceiver = new ChatReceiver();
+        ChatReceiver chatReceiver = new ChatReceiver();
         IntentFilter filter = new IntentFilter("NEW_CHAT_MESSAGE");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requireActivity().registerReceiver(chatReceiver, filter, Context.RECEIVER_EXPORTED);
@@ -100,7 +102,7 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         mNewChatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showChatOptionsDialog();
+                showNewChatRoomDialog();
             }
         });
 
@@ -130,7 +132,6 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        requireActivity().unregisterReceiver(chatReceiver);
     }
 
     @Override
@@ -145,59 +146,37 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
         pendingMessages.clear(); // 임시 메시지 리스트 초기화
     }
 
-    // 채팅방 옵션 다이얼로그 표시
-    private void showChatOptionsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("채팅방 옵션 선택");
-
-        String[] options = {"새로운 채팅방 개설", "기존 채팅방 입장"};
-        builder.setItems(options, (dialog, which) -> {
-            if (which == 0) {
-                showNewChatRoomDialog();
-            } else {
-                showJoinChatRoomDialog();
-            }
-        });
-
-        builder.show();
-    }
+//    // 채팅방 옵션 다이얼로그 표시
+//    private void showChatOptionsDialog() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+//        builder.setTitle("채팅방 옵션 선택");
+//
+//        String[] options = {"새로운 채팅방 개설", "기존 채팅방 입장"};
+//        builder.setItems(options, (dialog, which) -> {
+//            if (which == 0) {
+//                showNewChatRoomDialog();
+//            } else {
+//                showJoinChatRoomDialog();
+//            }
+//        });
+//
+//        builder.show();
+//    }
 
     // 새로운 채팅방 개설 다이얼로그
     private void showNewChatRoomDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("채팅방 이름 입력");
+        builder.setTitle("채팅방 코드 입력");
 
         final EditText input = new EditText(requireContext());
-        input.setHint("채팅방 이름");
+        input.setHint("채팅방 코드");
         builder.setView(input);
 
-        builder.setPositiveButton("개설", (dialog, which) -> {
+        builder.setPositiveButton("입장", (dialog, which) -> {
             String chatRoomName = input.getText().toString();
             if (!chatRoomName.isEmpty()) {
                 chatRoomIdentifier = chatRoomName;
                 openChatRoom(chatRoomName);
-            }
-        });
-
-        builder.setNegativeButton("취소", (dialog, which) -> dialog.cancel());
-
-        builder.show();
-    }
-
-    // 기존 채팅방 입장 다이얼로그
-    private void showJoinChatRoomDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("초대 코드 입력");
-
-        final EditText input = new EditText(requireContext());
-        input.setHint("초대 코드");
-        builder.setView(input);
-
-        builder.setPositiveButton("입장", (dialog, which) -> {
-            String inviteCode = input.getText().toString();
-            if (!inviteCode.isEmpty()) {
-                chatRoomIdentifier = inviteCode;
-                openChatRoom(inviteCode); // 초대 코드를 통해 채팅방 입장
             }
         });
 
@@ -345,6 +324,62 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
                     if (pendingMessages.size() >0) {
                         Log.d(TAG, "good: " + pendingMessages.get(pendingMessages.size()-1).getMessage());
                     }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+
+            getActivity().runOnUiThread(() -> {
+                try {
+                    String message = messageData.getString("message");
+                    String userName = messageData.getString("username");
+                    String profileImage = messageData.getString("profile_image");
+                    String timestamp = messageData.getString("timestamp");
+
+                    // 보낸 메시지와 동일한 메시지가 서버에서 돌아온 경우 무시
+                    if (sentMessages.contains(message)) {
+                        sentMessages.remove(message);
+                        return;
+                    }
+
+                    ChatMessage chatMessage = new ChatMessage(message, false, userName, profileImage, timestamp);
+                    mMessageList.add(chatMessage);
+                    mAdapter.notifyItemInserted(mMessageList.size() - 1);
+                    mRecyclerView.scrollToPosition(mMessageList.size() - 1);
+                    saveChatMessages(); // 메시지 저장
+                    // serviceIntent.sendNotification(message);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    };
+
+    @Override
+    public void onNewChatMessage(Object args) {
+        Log.d(TAG, "onChatMessage event triggered");
+        if (args != null) {
+            JSONObject messageData = (JSONObject) args;
+            Log.d(TAG, "New message: " + messageData);
+
+            // 이 부분을 수정하여 프래그먼트가 연결된 경우에만 UI 작업을 수행하도록 합니다.
+            if (!isAdded() || getActivity() == null) {
+                Log.d(TAG, "Fragment not attached to an activity, adding to pendingMessages");
+                try {
+                    String message = messageData.getString("message");
+                    String userName = messageData.getString("username");
+                    String profileImage = messageData.getString("profile_image");
+                    String timestamp = messageData.getString("timestamp");
+
+                    ChatMessage chatMessage = new ChatMessage(message, false, userName, profileImage, timestamp);
+                    pendingMessages.add(chatMessage);
+                    Log.d(TAG, "Added to pendingMessages: " + message);
+                    if (pendingMessages.size() >0) {
+                        Log.d(TAG, "good: " + pendingMessages.get(pendingMessages.size()-1).getMessage());
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -374,16 +409,6 @@ public class Fragment2 extends Fragment implements ChatMessageListener {
                 }
             });
         }
-    };
-
-    @Override
-    public void onNewChatMessage(String message) {
-        // 새로운 채팅 메시지를 처리
-        ChatMessage chatMessage = new ChatMessage(message, false, userName);
-        mMessageList.add(chatMessage);
-        mAdapter.notifyItemInserted(mMessageList.size() - 1);
-        mRecyclerView.scrollToPosition(mMessageList.size() - 1);
-        saveChatMessages(); // 메시지 저장
     }
 
     @Override
