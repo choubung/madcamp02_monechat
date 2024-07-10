@@ -123,3 +123,4 @@ Design: Figma
     - 이때 채팅 fragment가 꺼져도 메세지를 전달받아 저장해 놓고 채팅 fragment가 켜졌을 때 로딩하는 로직 구현을 통해 앱이 백그라운드에서 돌아가고 있을 때 채팅 메세지 전달받기 가능
 
 ## APK 파일 링크
+https://drive.google.com/file/d/1z3UEZ8UwFID1DX6mZXFMZSoUv3HFD2j3/view?usp=drive_link
