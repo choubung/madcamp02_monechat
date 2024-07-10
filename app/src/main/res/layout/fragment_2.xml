@@ -23,19 +23,27 @@
         android:clipToPadding="false"
         android:visibility="gone"/> <!-- 숨김 처리 -->
 
-    <!-- EditText는 채팅 화면에만 표시 -->
-    <EditText
-        android:id="@+id/input"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Type a message"
-        android:visibility="gone"/> <!-- 숨김 처리 -->
+        android:orientation="horizontal">
 
-    <!-- Send 버튼은 채팅 화면에만 표시 -->
-    <Button
-        android:id="@+id/sendButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send"
-        android:visibility="gone"/> <!-- 숨김 처리 -->
+        <!-- EditText는 채팅 화면에만 표시 -->
+        <EditText
+            android:id="@+id/input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="Type a message"
+            android:visibility="gone"/> <!-- 숨김 처리 -->
+
+        <!-- Send 버튼은 채팅 화면에만 표시 -->
+        <Button
+            android:id="@+id/sendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send"
+            android:visibility="gone"/> <!-- 숨김 처리 -->
+
+    </LinearLayout>
 </LinearLayout>

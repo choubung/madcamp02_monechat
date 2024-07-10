@@ -1,14 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     tools:context=".tab4.Fragment4">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="frag4" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFB5A0"
+        android:padding="20dp">
 
-</FrameLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="마이페이지"
+            android:layout_marginBottom="20dp"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:id="@+id/user_profile"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_marginVertical="15dp"
+            android:src="@drawable/icon_my_page">
+        </ImageView>
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="홍길동"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/user_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textSize="18dp"
+            android:text="example@mail.com"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:textColor="#837442"
+            android:textSize="16sp"
+            android:paddingLeft="0dp"
+            android:paddingTop="0dp"
+            android:includeFontPadding="false"
+            android:minHeight="48dp"
+            android:minWidth="0dp"
+            android:text="튜토리얼"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:textColor="#837442"
+            android:textSize="16sp"
+            android:paddingLeft="0dp"
+            android:paddingTop="0dp"
+            android:includeFontPadding="false"
+            android:minHeight="48dp"
+            android:minWidth="0dp"
+            android:text="로그아웃"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:textColor="#837442"
+            android:textSize="16sp"
+            android:paddingLeft="0dp"
+            android:paddingTop="0dp"
+            android:includeFontPadding="false"
+            android:minHeight="48dp"
+            android:minWidth="0dp"
+            android:text="회원탈퇴"/>
+    </LinearLayout>
+</LinearLayout>

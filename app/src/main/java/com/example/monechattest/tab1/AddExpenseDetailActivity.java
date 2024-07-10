@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.monechattest.R;
@@ -29,9 +30,8 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
     Button backBtn, saveBtn;
     ImageView categoryImageView;
     String[] categories = {"식사", "카페/간식", "생활/마트", "온라인쇼핑", "백화점", "금융/보험", "의료/건강", "주거/통신", "학습/교육", "교통/차량", "문화/예술/취미", "여행/숙박", "경조사/회비", "기타"};
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.KOREA); // gpt 코드
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.KOREA);
 
-    // 이미지 리소스 매핑
     HashMap<String, Integer> categoryImageMap = new HashMap<>();
 
     @Override
@@ -39,48 +39,35 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_expense_detail);
 
-        // EditText 초기화
         descriptionText = findViewById(R.id.descriptionText);
         amountText = findViewById(R.id.amountText);
         dateText = findViewById(R.id.dateText);
         memoText = findViewById(R.id.memoText);
-
-        // Spinner 초기화
         spinner = findViewById(R.id.spinner);
+        backBtn = findViewById(R.id.back);
+        saveBtn = findViewById(R.id.btnSave);
+        categoryImageView = findViewById(R.id.categoryImageView);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        // 카테고리 이미지 뷰 초기화
-        categoryImageView = findViewById(R.id.categoryImageView);
-
-        // 이미지 매핑 설정
         initializeCategoryImageMap();
 
-        // Spinner 선택 항목 변경 리스너 설정
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // 선택된 카테고리 가져오기
                 String selectedCategory = categories[position];
-                // 이미지 변경
                 updateCategoryImage(selectedCategory);
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // 선택되지 않은 경우
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // 금액 포맷 설정 메서드 호출
         setupAmountFormatting();
-
-        // 날짜 선택기 설정 메서드 호출
         setupDatePicker();
 
-        // '뒤로 가기' 버튼 설정
-        backBtn = findViewById(R.id.back);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,24 +75,47 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
             }
         });
 
-        // '저장' 버튼 설정
-        saveBtn = findViewById(R.id.btnSave);
+        // 수정된 부분 시작
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /* 기존 코드
-                Intent intent = new Intent();
-                // 저장 구현(putExtra) 요망
-                setResult(RESULT_OK, intent);
-                finish();*/
-
-                // 저장 처리 메서드 호출
-                saveExpense(); // gpt코드
+                if (areAllFieldsFilled()) { // 모든 필드가 채워졌는지 확인
+                    saveExpense();
+                } else {
+                    Toast.makeText(AddExpenseDetailActivity.this, "모든 내역을 입력하세요", Toast.LENGTH_SHORT).show(); // 필드가 채워지지 않으면 토스트 메시지 표시
+                }
             }
         });
+
+        // 각 EditText에 TextWatcher 추가
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                saveBtn.setEnabled(areAllFieldsFilled()); // 필드가 채워졌는지 확인하여 저장 버튼 활성화 여부 결정
+            }
+        };
+
+        descriptionText.addTextChangedListener(textWatcher);
+        amountText.addTextChangedListener(textWatcher);
+        dateText.addTextChangedListener(textWatcher);
+
+        saveBtn.setEnabled(areAllFieldsFilled()); // 초기 상태에서 저장 버튼 활성화 여부 결정
+        // 수정된 부분 끝
     }
 
-    // 카테고리와 이미지 리소스 ID를 매핑하는 메서드
+    // 모든 필드가 채워졌는지 확인하는 메서드 추가 (메모 필드는 제외)
+    private boolean areAllFieldsFilled() {
+        return !descriptionText.getText().toString().isEmpty() &&
+                !amountText.getText().toString().isEmpty() &&
+                !dateText.getText().toString().isEmpty();
+    }
+
     private void initializeCategoryImageMap() {
         categoryImageMap.put("식사", R.drawable.icon_expense_meal);
         categoryImageMap.put("카페/간식", R.drawable.icon_expense_cafe);
@@ -123,7 +133,6 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         categoryImageMap.put("기타", R.drawable.icon_expense_else);
     }
 
-    // 선택된 카테고리에 따라 이미지를 업데이트하는 메서드
     private void updateCategoryImage(String selectedCategory) {
         Integer imageResId = categoryImageMap.get(selectedCategory);
         if (imageResId != null) {
@@ -131,8 +140,7 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         }
     }
 
-    // 금액 입력 시 포맷을 지정하는 메서드
-    private void setupAmountFormatting() { // 문제 없을듯
+    private void setupAmountFormatting() {
         amountText.addTextChangedListener(new TextWatcher() {
             private String current = "";
 
@@ -162,7 +170,6 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         });
     }
 
-    // 날짜 선택기 설정 메서드
     private void setupDatePicker() {
         dateText.setOnClickListener(v -> {
             final Calendar calendar = Calendar.getInstance();
@@ -179,25 +186,22 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         });
     }
 
-    // 지출 정보를 저장하는 메서드
     private void saveExpense() {
         String description = descriptionText.getText().toString();
-        String amount = amountText.getText().toString().replace(",","");
+        String amount = amountText.getText().toString().replace(",", "");
         String dateStr = dateText.getText().toString();
         String memo = memoText.getText().toString();
         String category = spinner.getSelectedItem().toString();
 
-        Date date = null; // 데이터 컨버터
+        Date date = null;
         try {
             date = dateFormat.parse(dateStr);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        // ExpenseItem 객체 생성
         ExpenseItem expenseItem = new ExpenseItem(0, date, category, description, amount, memo, false);
 
-        // Intent에 데이터 추가하여 반환
         Intent intent = new Intent();
         intent.putExtra("expenseItem", expenseItem);
         setResult(RESULT_OK, intent);

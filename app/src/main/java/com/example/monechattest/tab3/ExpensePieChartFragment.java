@@ -99,7 +99,9 @@ public class ExpensePieChartFragment extends Fragment {
         Pie pie = AnyChart.pie();
         pie.data(dataEntries);
 
-        pie.palette(new String[]{"#ffdbd1", "#392e2b", "#f5e1a7", "#6c5d2f", "#77574e", "#8f4c38"});
+        pie.palette(new String[]{
+                "#FFB5A7", "#FCD5CE", "#F8EDEB", "#F9DCC4", "#FEC89A"
+        });
 
         pie.title("소비 카테고리별 금액");
 
