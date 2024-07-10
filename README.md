@@ -40,9 +40,7 @@ Design: Figma
 
 ### 0. 카카오 로그인 페이지
 
-- 앱을 처음 시작할 때 로고가 짧게 떠오릅니다.
 - 카카오로 로그인하기 버튼을 통해 앱에 로그인할 수 있습니다.
-<img src= https://github.com/choubung/madcamp02/assets/96229091/2a4e1c2f-2316-43ee-8661-d0643a7ab6ed width="200" height="400"/>
 <img src= https://github.com/choubung/madcamp02/assets/96229091/eb14d6cf-9251-4d5e-9a1c-27137d709c5a width="200" height="400"/>
 <br/>
 
