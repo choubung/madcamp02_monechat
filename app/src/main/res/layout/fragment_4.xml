@@ -47,6 +47,7 @@
         android:padding="20dp">
 
         <Button
+            android:id="@+id/tutorial_button"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:background="@android:color/transparent"
@@ -60,6 +61,7 @@
             android:text="튜토리얼"/>
 
         <Button
+            android:id="@+id/logout_button"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:background="@android:color/transparent"
@@ -73,6 +75,7 @@
             android:text="로그아웃"/>
 
         <Button
+            android:id="@+id/delete_account_button"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:background="@android:color/transparent"
