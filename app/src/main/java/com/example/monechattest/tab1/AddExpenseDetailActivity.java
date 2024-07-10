@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.monechattest.R;
@@ -93,16 +95,42 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /* 기존 코드
-                Intent intent = new Intent();
-                // 저장 구현(putExtra) 요망
-                setResult(RESULT_OK, intent);
-                finish();*/
-
-                // 저장 처리 메서드 호출
-                saveExpense(); // gpt코드
+                if (areAllFieldsFilled()) { // 모든 필드가 채워졌는지 확인
+                    saveExpense();
+                } else {
+                    Toast.makeText(AddExpenseDetailActivity.this, "모든 내역을 입력하세요", Toast.LENGTH_SHORT).show(); // 필드가 채워지지 않으면 토스트 메시지 표시
+                }
             }
         });
+
+        // 각 EditText에 TextWatcher 추가
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                saveBtn.setEnabled(areAllFieldsFilled()); // 필드가 채워졌는지 확인하여 저장 버튼 활성화 여부 결정
+            }
+        };
+
+        descriptionText.addTextChangedListener(textWatcher);
+        amountText.addTextChangedListener(textWatcher);
+        dateText.addTextChangedListener(textWatcher);
+        memoText.addTextChangedListener(textWatcher);
+
+        saveBtn.setEnabled(areAllFieldsFilled());
+    }
+
+    // 모든 필드가 채워졌는지 확인하는 메서드 추가
+    private boolean areAllFieldsFilled() {
+        return !descriptionText.getText().toString().isEmpty() &&
+                !amountText.getText().toString().isEmpty() &&
+                !dateText.getText().toString().isEmpty() &&
+                !memoText.getText().toString().isEmpty();
     }
 
     // 카테고리와 이미지 리소스 ID를 매핑하는 메서드
