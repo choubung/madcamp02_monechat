@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,9 +14,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.monechattest.MainActivity;
 import com.example.monechattest.R;
+import com.example.monechattest.database.AppDatabase;
+import com.example.monechattest.database.ExpenseEntity;
+import com.example.monechattest.database.SharedViewModel;
+import com.example.monechattest.tab2.Fragment2;
+
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,10 +43,14 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
 
     HashMap<String, Integer> categoryImageMap = new HashMap<>();
 
+    private SharedViewModel sharedViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_expense_detail);
+
+        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
         descriptionText = findViewById(R.id.descriptionText);
         amountText = findViewById(R.id.amountText);
@@ -75,19 +88,17 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
             }
         });
 
-        // 수정된 부분 시작
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (areAllFieldsFilled()) { // 모든 필드가 채워졌는지 확인
+                if (areAllFieldsFilled()) {
                     saveExpense();
                 } else {
-                    Toast.makeText(AddExpenseDetailActivity.this, "모든 내역을 입력하세요", Toast.LENGTH_SHORT).show(); // 필드가 채워지지 않으면 토스트 메시지 표시
+                    Toast.makeText(AddExpenseDetailActivity.this, "모든 내역을 입력하세요", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        // 각 EditText에 TextWatcher 추가
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -97,7 +108,7 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                saveBtn.setEnabled(areAllFieldsFilled()); // 필드가 채워졌는지 확인하여 저장 버튼 활성화 여부 결정
+                saveBtn.setEnabled(areAllFieldsFilled());
             }
         };
 
@@ -105,11 +116,9 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
         amountText.addTextChangedListener(textWatcher);
         dateText.addTextChangedListener(textWatcher);
 
-        saveBtn.setEnabled(areAllFieldsFilled()); // 초기 상태에서 저장 버튼 활성화 여부 결정
-        // 수정된 부분 끝
+        saveBtn.setEnabled(areAllFieldsFilled());
     }
 
-    // 모든 필드가 채워졌는지 확인하는 메서드 추가 (메모 필드는 제외)
     private boolean areAllFieldsFilled() {
         return !descriptionText.getText().toString().isEmpty() &&
                 !amountText.getText().toString().isEmpty() &&
@@ -200,11 +209,30 @@ public class AddExpenseDetailActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        ExpenseItem expenseItem = new ExpenseItem(0, date, category, description, amount, memo, false);
+        ExpenseEntity expenseEntity = new ExpenseEntity(description, date, category, amount, memo);
 
-        Intent intent = new Intent();
-        intent.putExtra("expenseItem", expenseItem);
-        setResult(RESULT_OK, intent);
-        finish();
+        // 데이터베이스에 저장
+        new Thread(() -> {
+            long id = AppDatabase.getInstance(getApplicationContext()).getExpenseDao().insert(expenseEntity);
+            expenseEntity.setIdx((int) id);
+            Log.d("AddExpenseDetailActivity", "Expense saved to database with id: " + id);
+
+            // ExpenseEntity를 ExpenseItem으로 변환
+            ExpenseItem expenseItem = new ExpenseItem(expenseEntity.getIdx(), expenseEntity.getDate(), expenseEntity.getCategory(), expenseEntity.getDescription(), expenseEntity.getAmount(), expenseEntity.getNote(), false);
+
+            runOnUiThread(() -> {
+                // SharedViewModel을 사용하여 데이터 설정
+                sharedViewModel.setNewExpense(expenseItem);
+
+                // Fragment2로 데이터를 전달하는 Intent 생성
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("expenseItem", expenseItem);
+                intent.putExtra("navigateToFragment2", true);
+                setResult(RESULT_OK, intent);
+                startActivity(intent);
+
+                finish();
+            });
+        }).start();
     }
 }
